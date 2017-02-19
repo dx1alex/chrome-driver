@@ -9,8 +9,6 @@ class Chrome extends Browser {
 
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
 let options = {
   proxy: '',
   windowSize: [1200, 800],
