@@ -1,0 +1,4 @@
+{
+    "vsicons.presets.angular": false,
+    "typescript.tsdk": "/usr/lib/node_modules/typescript/lib"
+}
