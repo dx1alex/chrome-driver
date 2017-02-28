@@ -1,8 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const webdriver_1 = require("../webdriver");
-const wd = new webdriver_1.Webdriver({
-    url: 'http://127.0.0.1:9515',
-});
+const wd = new webdriver_1.Webdriver('http://127.0.0.1:9515');
 main();
 async function main() {
     try {
@@ -35,6 +34,8 @@ async function main() {
         // console.log(await wdp.getSource({ sessionId }))
         console.log(await wd.getAllCookies());
         await sleep(5000);
+        // let e = await wdp.findElement({ sessionId, using: 'css selector', value: '#text' })
+        // console.log(e.value.ELEMENT)
     }
     catch (err) {
         console.error(err);

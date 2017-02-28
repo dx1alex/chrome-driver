@@ -1,4 +1,4 @@
-import { Base, Selector } from "./base";
+import { Base, Selector } from './base';
 import { Elements } from './elements';
 import { Utils } from './utils';
 export interface Mouse extends Utils, Elements {

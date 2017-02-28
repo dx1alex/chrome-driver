@@ -1,4 +1,4 @@
-import { Base, Cookie } from "./base";
+import { Base, Cookie } from './base';
 export declare class Cookies extends Base {
     setCookie(cookie: Cookie): Promise<void>;
     getCookies(): Promise<Cookie[]>;

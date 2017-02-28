@@ -1,4 +1,4 @@
-import { Base } from "./base";
+import { Base } from './base';
 export declare class Storage extends Base {
     localStorage(): Promise<string[]>;
     localStorage(key: string): Promise<string>;

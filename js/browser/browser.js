@@ -2,6 +2,7 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./base"));
 const helpers_1 = require("../helpers");
 const base_1 = require("./base");
@@ -21,12 +22,16 @@ const utils_1 = require("./utils");
 const sessions_1 = require("./sessions");
 const screenshot_1 = require("./screenshot");
 const scroll_1 = require("./scroll");
+const timeout_1 = require("./timeout");
+const command_history_1 = require("./command-history");
+const _class_1 = require("./$class");
+const fs = require("fs");
 class Browser extends base_1.Base {
-    constructor(wd_options, options) {
+    constructor(options) {
         super();
+        this._numCommand = 0;
         this.commandHistory = [];
-        this.options = options ? JSON.parse(JSON.stringify(options)) : {};
-        this.webdriver = new base_1.Webdriver(wd_options);
+        this.options = JSON.parse(JSON.stringify(options));
         if (!this.options.waitTimeout)
             this.options.waitTimeout = new.target.DEFAULT_WAIT_TIMEOUT;
         if (!this.options.waitInterval)
@@ -39,45 +44,55 @@ class Browser extends base_1.Base {
             submit: 0,
             upload: 0,
         }, this.options.pause || {});
-        applyMixins(Browser, [
-            scroll_1.Scroll, screenshot_1.Screenshot, sessions_1.Sessions, utils_1.Utils, storage_1.Storage, mouse_1.Mouse, input_1.Input, getter_1.Getter,
-            frames_1.Frames, cookies_1.Cookies, tabs_1.Tabs, alert_1.Alert, navigate_1.Navigate, exec_1.Exec, elements_1.Elements, state_1.State
-        ]);
-        return this._thisProxy = new Proxy(this, {
+        if (this.options.log) {
+            this.logStream = typeof this.options.log === 'boolean'
+                ? process.stdout
+                : fs.createWriteStream(this.options.log, { flags: 'a' });
+        }
+        this.webdriver = new base_1.Webdriver({
+            remote: this.options.remote,
+            log: this.logStream
+        });
+        return this._this_proxy = new Proxy(this, {
             get: (browser, command, r) => {
-                if (typeof browser[command] !== 'function' || new.target._noProxyList.includes(command)) {
+                if (typeof this[command] !== 'function' || new.target._no_proxy_list.includes(command)) {
                     return Reflect.get(browser, command, r);
                 }
                 return (...args) => {
-                    let lastCommand, date = new Date();
-                    if (!new.target._noCommandHistoryList.includes(command)) {
-                        const err = new Error, stack = err.stack.split('\n').slice(2).join('\n');
+                    const date = new Date(), err = new Error, stack = err.stack.split('\n').slice(1).join('\n'), strArgs = JSON.stringify(args.map(arg => typeof arg === 'function' ? arg.name : arg));
+                    const lastCommand = { command, args, date, stack };
+                    if (!this.options.noCommandHistory && !new.target._no_command_history_list.includes(command)) {
+                        this.commandHistory.push(lastCommand);
                         if (this.commandHistory.length > new.target.MAX_COMMAND_HISTORY_ITEMS) {
-                            this.commandHistory = this.commandHistory.slice(this.commandHistory.length - new.target.MAX_COMMAND_HISTORY_ITEMS);
+                            this.commandHistory = this.commandHistory
+                                .slice(this.commandHistory.length - new.target.MAX_COMMAND_HISTORY_ITEMS);
                         }
-                        this.commandHistory.push({
-                            command,
-                            args,
-                            date,
-                            stack
-                        });
-                        lastCommand = this.commandHistory[this.commandHistory.length - 1];
-                        // log
-                        const strArgs = JSON.stringify(args.map(arg => typeof arg === 'function' ? arg.name : arg));
-                        console.log(`${command} ${strArgs} ${getDateTime(date)}\n` + stack);
                     }
+                    if (this.logStream) {
+                        this.logStream.write(`[${++this._numCommand}] ${helpers_1.getDateTime(date)} \n${command} ${strArgs} \n${stack}\n\n`);
+                    }
+                    const timeStart = Date.now();
                     const res = browser[command](...args);
                     if (res instanceof Promise) {
-                        res.then((res) => lastCommand ? lastCommand.result = res : res, (err) => {
-                            if (lastCommand) {
-                                lastCommand.error = err;
-                                browser._lastError = lastCommand;
-                            }
-                            else {
-                                browser._lastError = err;
-                            }
+                        res.then((res) => {
+                            const timeEnd = Date.now();
+                            lastCommand.time = timeEnd - timeStart;
+                            lastCommand.result = res;
+                            this._lastCommand = lastCommand;
+                            return res;
+                        }, (err) => {
+                            const timeEnd = Date.now();
+                            lastCommand.time = timeEnd - timeStart;
+                            lastCommand.error = err;
+                            this._lastError = lastCommand;
                             return err;
                         });
+                    }
+                    else {
+                        const timeEnd = Date.now();
+                        lastCommand.time = timeEnd - timeStart;
+                        lastCommand.result = res;
+                        this._lastCommand = lastCommand;
                     }
                     return res;
                 };
@@ -85,15 +100,10 @@ class Browser extends base_1.Base {
         });
     }
     get _() {
-        return this; //._thisProxy
+        return this.options.verbose ? this._this_proxy : this;
     }
     getStatus() {
         return this.webdriver.status();
-    }
-    async setTimeouts(timeouts) {
-        for (let [type, ms] of Object.entries(timeouts)) {
-            await this.webdriver.setTimeouts({ type, ms });
-        }
     }
     async quit() {
         await this.webdriver.deleteSession({ sessionId: this.sessionId });
@@ -114,12 +124,16 @@ class Browser extends base_1.Base {
         this.capabilities = res.value;
         this.started = true;
         if (init.timeouts) {
-            await this.setTimeouts(init.timeouts);
+            await this._.setTimeouts(init.timeouts);
         }
         if (init.maximaze) {
             await this._.maximize();
         }
         else {
+            if (init.window) {
+                init.windowPosition = [init.window[0], init.window[1]];
+                init.windowSize = [init.window[2], init.window[3]];
+            }
             if (init.windowPosition) {
                 await this._.setPosition(init.windowPosition[0], init.windowPosition[1]);
             }
@@ -131,62 +145,18 @@ class Browser extends base_1.Base {
             await this._.url(init.url);
         }
     }
-    $(selector) {
-        return new Proxy(this, {
-            get: (browser, command, r) => {
-                if (typeof browser[command] !== 'function' || !this.constructor._$List.includes(command)) {
-                    return void 0;
-                }
-                return async (...args) => {
-                    if (typeof selector === 'string')
-                        selector = await this._.element(selector);
-                    return browser[command](selector, ...args);
-                };
-            }
-        });
-    }
-    getCommandHistory(endItems = 0) {
-        return this.commandHistory.slice(-endItems);
-    }
-    getCommandHistoryErrors(endItems = 0) {
-        return this.commandHistory.filter(v => v.error).slice(-endItems);
-    }
-    lastError(err) {
-        return this._lastError && this._lastError == err ? this._lastError : err;
-    }
-    pause(options, value) {
-        if (typeof options === 'string') {
-            this.options.pause[options] = value;
-            return;
-        }
-        Object.assign(this.options.pause, options);
-    }
-    dump() {
-    }
-    proxy() {
-    }
 }
-Browser._$List = [
-    'script', 'scriptAll', 'scriptAllAsync', 'scriptAsync', 'html', 'text', 'tagName', 'attr', 'prop', 'css',
-    'classList', 'size', 'location', 'locationInView', 'keys', 'type', 'clear', 'empty', 'submit', 'check',
-    'uncheck', 'uploadFile', 'select', 'unselect', 'form', 'click', 'mouseMoveTo', 'mouseClickTo', 'isExists',
-    'isSelected', 'isEnabled', 'isFocused', 'isReadonly', 'isVisible', 'hasText', 'hasClass', 'hasAttribute'
-];
-Browser._noProxyList = ['constructor', '$', 'getCommandHistory', 'getCommandHistoryErrors', 'lastError'];
-Browser._noCommandHistoryList = ['waitFor'];
+Browser._no_command_history_list = ['waitFor'];
+Browser._no_proxy_list = [_class_1.$Class, command_history_1.CommandHistory]
+    .map(n => Object.getOwnPropertyNames(n.prototype).filter(v => v !== 'constructor'))
+    .reduce((a, b) => a.concat(b))
+    .concat(['elementId']);
 Browser.DEFAULT_WAIT_TIMEOUT = 30000;
 Browser.DEFAULT_WAIT_INTERVAL = 1000;
-Browser.MAX_COMMAND_HISTORY_ITEMS = 1000;
+Browser.MAX_COMMAND_HISTORY_ITEMS = 100;
 Browser.KEY = helpers_1.UNICODE_KEYS;
 exports.Browser = Browser;
-function applyMixins(derivedCtor, baseCtors) {
-    baseCtors.forEach(baseCtor => {
-        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-            derivedCtor.prototype[name] = baseCtor.prototype[name];
-        });
-    });
-}
-function getDateTime(d = new Date()) {
-    return `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)} `
-        + `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}:${('0' + d.getSeconds()).slice(-2)}.${(d.getMilliseconds())}`;
-}
+helpers_1.applyMixins(Browser, [
+    scroll_1.Scroll, screenshot_1.Screenshot, sessions_1.Sessions, utils_1.Utils, storage_1.Storage, mouse_1.Mouse, input_1.Input, getter_1.Getter, command_history_1.CommandHistory,
+    frames_1.Frames, cookies_1.Cookies, tabs_1.Tabs, alert_1.Alert, navigate_1.Navigate, exec_1.Exec, elements_1.Elements, state_1.State, timeout_1.Timeout, _class_1.$Class
+]);

@@ -1,59 +1,67 @@
 export * from './base'
 
-import { UnicodeKeys, UNICODE_KEYS } from "../helpers"
+import {
+  UnicodeKeys,
+  UNICODE_KEYS,
+  getDateTime,
+  applyMixins
+} from '../helpers'
 
 import {
   Base,
   BrowserOptions,
+  BrowserStartOptions,
   Selector,
   Timeouts,
-  WebdriverOptions,
   Webdriver,
+  WebdriverOptions,
   PauseSettings
-} from "./base";
+} from './base'
 
-import { Exec } from './exec';
-import { Elements } from './elements';
-import { State } from "./state";
-import { Navigate } from './navigate';
-import { Alert } from "./alert";
-import { Tabs } from './tabs';
-import { Cookies } from './cookies';
-import { Frames } from './frames';
-import { Getter } from './getter';
-import { Input } from './input';
-import { Mouse } from './mouse';
-import { Storage } from './storage';
-import { Utils } from './utils';
-import { Sessions } from './sessions';
-import { Screenshot } from './screenshot';
-import { Scroll } from './scroll';
+import { Exec } from './exec'
+import { Elements } from './elements'
+import { State } from './state'
+import { Navigate } from './navigate'
+import { Alert } from './alert'
+import { Tabs } from './tabs'
+import { Cookies } from './cookies'
+import { Frames } from './frames'
+import { Getter } from './getter'
+import { Input } from './input'
+import { Mouse } from './mouse'
+import { Storage } from './storage'
+import { Utils } from './utils'
+import { Sessions } from './sessions'
+import { Screenshot } from './screenshot'
+import { Scroll } from './scroll'
+import { Timeout } from './timeout'
+import { CommandHistory, CommandHistoryObject } from './command-history'
+import { $Class } from './$class'
 
+import * as fs from 'fs'
 
 export class Browser extends Base {
-  protected static _$List: string[] = [
-    'script', 'scriptAll', 'scriptAllAsync', 'scriptAsync', 'html', 'text', 'tagName', 'attr', 'prop', 'css',
-    'classList', 'size', 'location', 'locationInView', 'keys', 'type', 'clear', 'empty', 'submit', 'check',
-    'uncheck', 'uploadFile', 'select', 'unselect', 'form', 'click', 'mouseMoveTo', 'mouseClickTo', 'isExists',
-    'isSelected', 'isEnabled', 'isFocused', 'isReadonly', 'isVisible', 'hasText', 'hasClass', 'hasAttribute'
-  ]
-  protected static _noProxyList: string[] = ['constructor', '$', 'getCommandHistory', 'getCommandHistoryErrors', 'lastError']
-  protected static _noCommandHistoryList: string[] = ['waitFor']
+  protected static _no_command_history_list: string[] = ['waitFor']
+  protected static _no_proxy_list: string[] = [$Class, CommandHistory]
+    .map(n => Object.getOwnPropertyNames(n.prototype).filter(v => v !== 'constructor'))
+    .reduce((a, b) => a.concat(b))
+    .concat(['elementId'])
+
   protected static DEFAULT_WAIT_TIMEOUT = 30000
   protected static DEFAULT_WAIT_INTERVAL = 1000
-  protected static MAX_COMMAND_HISTORY_ITEMS = 1000
+  protected static MAX_COMMAND_HISTORY_ITEMS = 100
 
   static KEY = UNICODE_KEYS
 
-  private _lastError: any
-  commandHistory: any[] = []
+  private _numCommand = 0
 
-  constructor(wd_options: WebdriverOptions, options?: BrowserOptions) {
+  commandHistory: CommandHistoryObject[] = []
+  logStream: NodeJS.WritableStream
+
+  constructor(options: BrowserOptions) {
     super()
 
-    this.options = options ? JSON.parse(JSON.stringify(options)) : {}
-
-    this.webdriver = new Webdriver(wd_options)
+    this.options = JSON.parse(JSON.stringify(options))
 
     if (!this.options.waitTimeout) this.options.waitTimeout = new.target.DEFAULT_WAIT_TIMEOUT
     if (!this.options.waitInterval) this.options.waitInterval = new.target.DEFAULT_WAIT_INTERVAL
@@ -67,75 +75,82 @@ export class Browser extends Base {
       upload: 0,
     }, this.options.pause || {})
 
-    applyMixins(Browser, [
-      Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input, Getter,
-      Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State
-    ])
+    if (this.options.log) {
+      this.logStream = typeof this.options.log === 'boolean'
+        ? process.stdout
+        : fs.createWriteStream(this.options.log, { flags: 'a' })
+    }
 
-    return this._thisProxy = new Proxy(this, {
-      get: (browser, command, r) => {
+    this.webdriver = new Webdriver({
+      remote: this.options.remote,
+      log: this.logStream
+    })
 
-        if (typeof browser[command] !== 'function' || new.target._noProxyList.includes(<string>command)) {
+    return this._this_proxy = new Proxy(this, {
+      get: (browser, command: string, r) => {
+        if (typeof this[command] !== 'function' || new.target._no_proxy_list.includes(command)) {
           return Reflect.get(browser, command, r)
         }
 
         return (...args: any[]) => {
-          let lastCommand: any,
-            date = new Date()
+          const date = new Date(),
+            err = new Error,
+            stack = err.stack.split('\n').slice(1).join('\n'),
+            strArgs = JSON.stringify(args.map(arg => typeof arg === 'function' ? arg.name : arg))
 
-          if (!new.target._noCommandHistoryList.includes(<string>command)) {
-            const err = new Error,
-              stack = err.stack.split('\n').slice(2).join('\n')
+          const lastCommand: CommandHistoryObject = { command, args, date, stack }
+
+          if (!this.options.noCommandHistory && !new.target._no_command_history_list.includes(command)) {
+            this.commandHistory.push(lastCommand)
 
             if (this.commandHistory.length > new.target.MAX_COMMAND_HISTORY_ITEMS) {
-              this.commandHistory = this.commandHistory.slice(this.commandHistory.length - new.target.MAX_COMMAND_HISTORY_ITEMS)
+              this.commandHistory = this.commandHistory
+                .slice(this.commandHistory.length - new.target.MAX_COMMAND_HISTORY_ITEMS)
             }
-
-            this.commandHistory.push({
-              command,
-              args,
-              date,
-              stack
-            })
-            lastCommand = this.commandHistory[this.commandHistory.length - 1]
-
-            // log
-            const strArgs = JSON.stringify(args.map(arg => typeof arg === 'function' ? arg.name : arg))
-            console.log(`${command} ${strArgs} ${getDateTime(date)}\n` + stack)
           }
 
+          if (this.logStream) {
+            this.logStream.write(`[${++this._numCommand}] ${getDateTime(date)} \n${command} ${strArgs} \n${stack}\n\n`)
+          }
+
+          const timeStart = Date.now()
           const res = browser[command](...args)
 
           if (res instanceof Promise) {
-            res.then((res: any) => lastCommand ? lastCommand.result = res : res,
+            res.then(
+              (res: any) => {
+                const timeEnd = Date.now()
+                lastCommand.time = timeEnd - timeStart
+                lastCommand.result = res
+                this._lastCommand = lastCommand
+                return res
+              },
               (err: any) => {
-                if (lastCommand) {
-                  lastCommand.error = err
-                  browser._lastError = lastCommand
-                } else {
-                  browser._lastError = err
-                }
+                const timeEnd = Date.now()
+                lastCommand.time = timeEnd - timeStart
+                lastCommand.error = err
+                this._lastError = lastCommand
                 return err
               })
+          } else {
+            const timeEnd = Date.now()
+            lastCommand.time = timeEnd - timeStart
+            lastCommand.result = res
+            this._lastCommand = lastCommand
           }
+
           return res
         }
       }
     })
   }
 
-  protected get _() {
-    return this//._thisProxy
+  protected get _(): this {
+    return this.options.verbose ? this._this_proxy : this
   }
 
   getStatus() {
     return this.webdriver.status()
-  }
-
-  async setTimeouts(timeouts: Timeouts) {
-    for (let [type, ms] of <[any, any][]>Object.entries(timeouts)) {
-      await this.webdriver.setTimeouts({ type, ms })
-    }
   }
 
   async quit() {
@@ -143,7 +158,7 @@ export class Browser extends Base {
     this.started = false
   }
 
-  async start(options: BrowserOptions = {}) {
+  async start(options: BrowserStartOptions = {}) {
     let init: BrowserOptions = Object.assign({}, this.options, options)
     init = JSON.parse(JSON.stringify(init))
 
@@ -161,12 +176,16 @@ export class Browser extends Base {
     this.started = true
 
     if (init.timeouts) {
-      await this.setTimeouts(init.timeouts)
+      await this._.setTimeouts(init.timeouts)
     }
 
     if (init.maximaze) {
       await this._.maximize()
     } else {
+      if (init.window) {
+        init.windowPosition = [init.window[0], init.window[1]]
+        init.windowSize = [init.window[2], init.window[3]]
+      }
       if (init.windowPosition) {
         await this._.setPosition(init.windowPosition[0], init.windowPosition[1])
       }
@@ -180,111 +199,14 @@ export class Browser extends Base {
     }
   }
 
-  $(selector: Selector): Browser$ {
-    return new Proxy(<any>this, {
-      get: (browser, command, r) => {
-        if (typeof browser[command] !== 'function' || !(this.constructor as typeof Browser)._$List.includes(<string>command)) {
-          return void 0
-        }
-
-        return async (...args: any[]) => {
-          if (typeof selector === 'string') selector = await this._.element(selector)
-          return browser[command](selector, ...args)
-        }
-      }
-    })
-  }
-
-  getCommandHistory(endItems = 0) {
-    return this.commandHistory.slice(-endItems)
-  }
-
-  getCommandHistoryErrors(endItems = 0) {
-    return this.commandHistory.filter(v => v.error).slice(-endItems)
-  }
-
-  lastError(err?: any) {
-    return this._lastError && this._lastError == err ? this._lastError : err
-  }
-
-  pause(action: keyof PauseSettings, value: number): void
-  pause(options: PauseSettings): void
-  pause(options: PauseSettings | keyof PauseSettings, value?: number) {
-    if (typeof options === 'string') {
-      this.options.pause[options] = value
-      return
-    }
-    Object.assign(this.options.pause, options)
-  }
-
-
-  dump() {
-
-  }
-
-  proxy() {
-
-  }
-
 }
 
-function applyMixins(derivedCtor: any, baseCtors: any[]) {
-  baseCtors.forEach(baseCtor => {
-    Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-      derivedCtor.prototype[name] = baseCtor.prototype[name]
-    })
-  })
-}
+applyMixins(Browser, [
+  Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input, Getter, CommandHistory,
+  Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State, Timeout, $Class
+])
 
-function getDateTime(d = new Date()) {
-  return `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)} `
-    + `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}:${('0' + d.getSeconds()).slice(-2)}.${(d.getMilliseconds())}`
-}
-
-export interface Browser
-  extends Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input,
-  Getter, Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State {
-}
-
-export interface Browser$ {
-  //type Keys$ = keyof Browser$ // ctrl+c ;)
-
-  script(code: string | Function, ...args: any[]): Promise<any>;
-  scriptAll(code: string | Function, ...args: any[]): Promise<any>;
-  scriptAllAsync(code: string | Function, ...args: any[]): Promise<any>;
-  scriptAsync(code: string | Function, ...args: any[]): Promise<any>;
-  html(): Promise<string>;
-  text(): Promise<string>;
-  tagName(): Promise<string>;
-  attr(attr: string): Promise<string>;
-  prop(prop: string): Promise<string>;
-  css(propertyName: string): Promise<string>;
-  classList(): Promise<string[]>;
-  size(): Promise<{ width: number, height: number }>;
-  location(): Promise<{ x: number, y: number }>;
-  locationInView(): Promise<{ x: number, y: number; }>;
-  keys(...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
-  type(...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
-  clear(): Promise<void>;
-  empty(): Promise<void>;
-  submit(pause?: number): Promise<void>;
-  check(pause?: number): Promise<boolean>;
-  uncheck(pause?: number): Promise<boolean>;
-  uploadFile(input_file: Selector, filePath: string, pause?: number): Promise<void>;
-  select(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean): Promise<void>;
-  unselect(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean): Promise<void>;
-  form(form: Selector, inputs: any, ...submitAndPause: (boolean | number)[]): Promise<void>;
-  click(pause?: number): Promise<void>;
-  mouseMoveTo(xoffset?: number, yoffset?: number, pause?: number): Promise<void>;
-  mouseClickTo(xoffset?: number, yoffset?: number): Promise<void>;
-  isExists(): Promise<boolean>;
-  isSelected(): Promise<boolean>;
-  isEnabled(): Promise<boolean>;
-  isFocused(): Promise<boolean>;
-  isReadonly(): Promise<boolean>;
-  isVisible(): Promise<boolean>;
-  hasText(text: string | RegExp): Promise<boolean>;
-  hasClass(name: string): Promise<boolean>;
-  hasAttribute(attr: string): Promise<boolean>;
-
+export interface Browser extends
+  Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input, Getter, CommandHistory,
+  Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State, Timeout, $Class {
 }

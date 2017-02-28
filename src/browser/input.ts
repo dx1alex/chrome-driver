@@ -1,10 +1,10 @@
-import { UnicodeKeys, checkUnicode } from "../helpers";
-import { Base, Selector, WebElement } from "./base";
-import { Elements } from "./elements";
-import { Getter } from "./getter";
-import { Exec } from "./exec";
-import { Mouse } from './mouse';
-import { Utils } from './utils';
+import { UnicodeKeys, checkUnicode } from '../helpers'
+import { Base, Selector, WebElement } from './base'
+import { Elements } from './elements'
+import { Getter } from './getter'
+import { Exec } from './exec'
+import { Mouse } from './mouse'
+import { Utils } from './utils'
 
 export interface Input extends Utils, Elements, Getter, Exec, Mouse {
 }

@@ -1,7 +1,7 @@
-import { Selector, Base } from './base';
-import { Elements } from "./elements"
-import { Exec } from "./exec";
-import { Getter } from './getter';
+import { Selector, Base } from './base'
+import { Elements } from './elements'
+import { Exec } from './exec'
+import { Getter } from './getter'
 
 export interface State extends Elements, Exec, Getter {
 }

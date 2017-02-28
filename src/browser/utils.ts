@@ -1,11 +1,21 @@
-import { Base, Selector } from './base';
-import { State } from "./state";
-import { Elements } from './elements';
+import { Base, Selector, PauseSettings } from './base'
+import { State } from './state'
+import { Elements } from './elements'
 
 export interface Utils extends Elements {
 }
 
 export class Utils extends Base {
+
+  pause(action: keyof PauseSettings, value: number): void
+  pause(options: PauseSettings): void
+  pause(options: PauseSettings | keyof PauseSettings, value?: number) {
+    if (typeof options === 'string') {
+      this.options.pause[options] = value
+      return
+    }
+    Object.assign(this.options.pause, options)
+  }
 
   sleep(ms: number, ms2 = 0): Promise<void> {
     if (ms2) {
@@ -69,7 +79,7 @@ export class Utils extends Base {
           const obj = {
             [name]: () => browser[state](el, ...(args.slice(1)))
           }
-          return this._thisProxy.waitUntil(obj[name], <any>timeoutOrSettings, interval)
+          return this._.waitUntil(obj[name], <any>timeoutOrSettings, interval)
         }
       }
     })

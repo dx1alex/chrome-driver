@@ -1,6 +1,6 @@
-import { Base, Selector } from "./base";
+import { Base, Selector } from './base';
 import { Exec } from './exec';
-import { Tabs } from "./tabs";
+import { Tabs } from './tabs';
 export interface Scroll extends Exec, Tabs {
 }
 export declare class Scroll extends Base {

@@ -1,14 +1,12 @@
 import * as fs from 'fs'
-import { Base, Selector } from "./base";
-import { Elements } from './elements';
-import { Exec } from "./exec";
-import { Tabs } from "./tabs";
-import { Navigate } from "./navigate";
-
+import { Base, Selector } from './base'
+import { Elements } from './elements'
+import { Exec } from './exec'
+import { Tabs } from './tabs'
+import { Navigate } from './navigate'
 
 export interface Getter extends Elements, Exec, Tabs, Navigate {
 }
-
 
 export class Getter extends Base {
 

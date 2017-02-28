@@ -1,12 +1,11 @@
-import { Base, Selector } from "./base";
+import { Base, Selector } from './base'
 import { Exec } from './exec'
-import { Tabs } from "./tabs";
+import { Tabs } from './tabs'
 
 export interface Scroll extends Exec, Tabs {
 }
 
 export class Scroll extends Base {
-
   //TODO оптимизировать чтобы offsetTop при alignToTop == 'center' вычислялся на стороне браузера
   async scroll(selector: Selector, alignToTop: boolean | 'top' | 'bottom' | 'center' = true, offsetTop = 0) {
     if (alignToTop === 'top') alignToTop = true
@@ -22,7 +21,6 @@ export class Scroll extends Base {
       if (offsetTop) scrollBy(0, offsetTop)
     }, alignToTop, offsetTop)
   }
-
   //TODO
   scrollToElement(selector: Selector, parent: Selector, alignToTop: boolean | 'top' | 'bottom' | 'center' = true, offsetTop?: number) {
 

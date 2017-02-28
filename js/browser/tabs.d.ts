@@ -1,5 +1,5 @@
-import { Base } from "./base";
-import { Exec } from "./exec";
+import { Base } from './base';
+import { Exec } from './exec';
 export interface Tabs extends Exec {
 }
 export declare class Tabs extends Base {

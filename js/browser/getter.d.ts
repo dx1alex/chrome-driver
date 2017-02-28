@@ -1,8 +1,8 @@
-import { Base, Selector } from "./base";
+import { Base, Selector } from './base';
 import { Elements } from './elements';
-import { Exec } from "./exec";
-import { Tabs } from "./tabs";
-import { Navigate } from "./navigate";
+import { Exec } from './exec';
+import { Tabs } from './tabs';
+import { Navigate } from './navigate';
 export interface Getter extends Elements, Exec, Tabs, Navigate {
 }
 export declare class Getter extends Base {

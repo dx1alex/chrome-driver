@@ -1,4 +1,4 @@
-import { Base, Capabilities } from "./base";
+import { Base, Capabilities } from './base'
 
 export class Sessions extends Base {
 
@@ -12,7 +12,7 @@ export class Sessions extends Base {
   }
 
   getSessions() {
-    return this.webdriver.getSessions({ sessionId: this.sessionId })
+    return this.webdriver.getSessions()
   }
 
 }

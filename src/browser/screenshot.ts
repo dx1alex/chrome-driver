@@ -1,14 +1,13 @@
 import * as fs from 'fs'
-import { Base, Selector } from "./base";
-import { Elements } from './elements';
-import { Exec } from "./exec";
-import { Getter } from "./getter";
-import { Scroll } from "./scroll";
+import { Base, Selector } from './base'
+import { Elements } from './elements'
+import { Exec } from './exec'
+import { Getter } from './getter'
+import { Scroll } from './scroll'
 
 
 export interface Screenshot extends Scroll, Getter, Elements, Exec {
 }
-
 
 export class Screenshot extends Base {
 

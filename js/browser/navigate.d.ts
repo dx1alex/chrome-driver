@@ -1,4 +1,4 @@
-import { Base } from "./base";
+import { Base } from './base';
 import { Utils } from './utils';
 export interface Navigate extends Utils {
 }

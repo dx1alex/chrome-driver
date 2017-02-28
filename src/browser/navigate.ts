@@ -1,5 +1,5 @@
-import { Base, Selector } from "./base";
-import { Utils } from './utils';
+import { Base, Selector } from './base'
+import { Utils } from './utils'
 
 export interface Navigate extends Utils {
 }

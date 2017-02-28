@@ -1,19 +1,32 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class Exec extends base_1.Base {
     execute(code, ...args) {
         let script = '' + code;
-        let async = script.startsWith('async');
-        if (typeof code === 'function')
-            script = `return (${script.replace('async', '')}).apply(null, arguments)`;
-        if (async) {
-            return this.webdriver.executeAsyncScript({ script, args });
+        if (typeof code === 'function') {
+            if (script.startsWith('async')) {
+                return this.executeAsync(code, args);
+            }
+            script = `return (${script}).apply(null, arguments)`;
         }
         return this.webdriver.executeScript({ script, args });
     }
-    executeAsync(code, ...args) {
-        const script = typeof code === 'function' ? `return (${code}).apply(null, arguments)` : code;
-        return this.webdriver.executeAsyncScript({ script, args });
+    async executeAsync(code, ...args) {
+        const script = typeof code === 'function'
+            ? `let done = arguments[arguments.length -1];      
+      let result = (${code}).apply(null, arguments);
+      if(result instanceof Promise) { 
+        result.then(done, err => done({__error: {message: err.message, stack: err.stack}}))
+      }`
+            : code;
+        const res = await this.webdriver.executeAsyncScript({ script, args });
+        if (res && res.__error) {
+            const error = new Error(res.__error.message);
+            error.stack += `\n(browser context stack)\n${res.__error.stack}`;
+            throw error;
+        }
+        return res;
     }
     async script(selector, code, ...args) {
         let sel;
@@ -69,11 +82,3 @@ class Exec extends base_1.Base {
     }
 }
 exports.Exec = Exec;
-// function getScript(code: string | Function) {
-//   return `return ((sel) => {
-//       arguments[0] = Array.isArray(sel) 
-//       ? sel.map(s => (s.index != null ? document.querySelectorAll(s.value).item(s.index) : document.querySelector(s.value))) 
-//       : (sel.index != null ? document.querySelectorAll(sel.value).item(sel.index) : document.querySelector(sel.value));
-//       return (${code}).apply(null, arguments)
-//     }).apply(null, arguments)`
-// }

@@ -4,18 +4,17 @@ import {
   Webdriver,
   Capabilities,
   Timeouts,
-  LocatorStrategy,
+  LocatorStrategy
 } from '../webdriver'
 
 
-export class Base {
+export abstract class Base {
   options: BrowserOptions
   webdriver: Webdriver
   capabilities: Capabilities
   sessionId = ''
   started = false
-
-  protected _thisProxy: this
+  protected _this_proxy = this
   protected get _() {
     return this
   }
@@ -39,17 +38,24 @@ export interface WebElement {
 
 export type Selector = string | WebElement
 
-export interface BrowserOptions {
-  proxy?: string
-  url?: string
-  maximaze?: boolean
-  windowSize?: [number, number]
-  windowPosition?: [number, number]
-  timeouts?: Timeouts
-  useragent?: string
-  desiredCapabilities?: Capabilities
+export interface BrowserOptions extends BrowserStartOptions {
+  remote: string
+  log?: string | boolean
+  verbose?: boolean
 
   waitTimeout?: number
   waitInterval?: number
   pause?: PauseSettings
+  noCommandHistory?: boolean
+}
+
+export interface BrowserStartOptions {
+  proxy?: string
+  url?: string
+  maximaze?: boolean
+  windowSize?: number[]
+  windowPosition?: number[]
+  window?: number[]
+  timeouts?: Timeouts
+  desiredCapabilities?: Capabilities
 }

@@ -1,11 +1,11 @@
+/// <reference types="node" />
 export * from './base';
-import { UnicodeKeys } from "../helpers";
-import { Base, BrowserOptions, Selector, Timeouts, WebdriverOptions, PauseSettings } from "./base";
+import { Base, BrowserOptions, BrowserStartOptions } from './base';
 import { Exec } from './exec';
 import { Elements } from './elements';
-import { State } from "./state";
+import { State } from './state';
 import { Navigate } from './navigate';
-import { Alert } from "./alert";
+import { Alert } from './alert';
 import { Tabs } from './tabs';
 import { Cookies } from './cookies';
 import { Frames } from './frames';
@@ -17,10 +17,12 @@ import { Utils } from './utils';
 import { Sessions } from './sessions';
 import { Screenshot } from './screenshot';
 import { Scroll } from './scroll';
+import { Timeout } from './timeout';
+import { CommandHistory, CommandHistoryObject } from './command-history';
+import { $Class } from './$class';
 export declare class Browser extends Base {
-    protected static _$List: string[];
-    protected static _noProxyList: string[];
-    protected static _noCommandHistoryList: string[];
+    protected static _no_command_history_list: string[];
+    protected static _no_proxy_list: string[];
     protected static DEFAULT_WAIT_TIMEOUT: number;
     protected static DEFAULT_WAIT_INTERVAL: number;
     protected static MAX_COMMAND_HISTORY_ITEMS: number;
@@ -108,70 +110,14 @@ export declare class Browser extends Base {
         command: string;
         meta: string;
     };
-    private _lastError;
-    commandHistory: any[];
-    constructor(wd_options: WebdriverOptions, options?: BrowserOptions);
+    private _numCommand;
+    commandHistory: CommandHistoryObject[];
+    logStream: NodeJS.WritableStream;
+    constructor(options: BrowserOptions);
     protected readonly _: this;
     getStatus(): Promise<any>;
-    setTimeouts(timeouts: Timeouts): Promise<void>;
     quit(): Promise<void>;
-    start(options?: BrowserOptions): Promise<void>;
-    $(selector: Selector): Browser$;
-    getCommandHistory(endItems?: number): any[];
-    getCommandHistoryErrors(endItems?: number): any[];
-    lastError(err?: any): any;
-    pause(action: keyof PauseSettings, value: number): void;
-    pause(options: PauseSettings): void;
-    dump(): void;
-    proxy(): void;
+    start(options?: BrowserStartOptions): Promise<void>;
 }
-export interface Browser extends Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input, Getter, Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State {
-}
-export interface Browser$ {
-    script(code: string | Function, ...args: any[]): Promise<any>;
-    scriptAll(code: string | Function, ...args: any[]): Promise<any>;
-    scriptAllAsync(code: string | Function, ...args: any[]): Promise<any>;
-    scriptAsync(code: string | Function, ...args: any[]): Promise<any>;
-    html(): Promise<string>;
-    text(): Promise<string>;
-    tagName(): Promise<string>;
-    attr(attr: string): Promise<string>;
-    prop(prop: string): Promise<string>;
-    css(propertyName: string): Promise<string>;
-    classList(): Promise<string[]>;
-    size(): Promise<{
-        width: number;
-        height: number;
-    }>;
-    location(): Promise<{
-        x: number;
-        y: number;
-    }>;
-    locationInView(): Promise<{
-        x: number;
-        y: number;
-    }>;
-    keys(...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
-    type(...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
-    clear(): Promise<void>;
-    empty(): Promise<void>;
-    submit(pause?: number): Promise<void>;
-    check(pause?: number): Promise<boolean>;
-    uncheck(pause?: number): Promise<boolean>;
-    uploadFile(input_file: Selector, filePath: string, pause?: number): Promise<void>;
-    select(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean): Promise<void>;
-    unselect(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean): Promise<void>;
-    form(form: Selector, inputs: any, ...submitAndPause: (boolean | number)[]): Promise<void>;
-    click(pause?: number): Promise<void>;
-    mouseMoveTo(xoffset?: number, yoffset?: number, pause?: number): Promise<void>;
-    mouseClickTo(xoffset?: number, yoffset?: number): Promise<void>;
-    isExists(): Promise<boolean>;
-    isSelected(): Promise<boolean>;
-    isEnabled(): Promise<boolean>;
-    isFocused(): Promise<boolean>;
-    isReadonly(): Promise<boolean>;
-    isVisible(): Promise<boolean>;
-    hasText(text: string | RegExp): Promise<boolean>;
-    hasClass(name: string): Promise<boolean>;
-    hasAttribute(attr: string): Promise<boolean>;
+export interface Browser extends Scroll, Screenshot, Sessions, Utils, Storage, Mouse, Input, Getter, CommandHistory, Frames, Cookies, Tabs, Alert, Navigate, Exec, Elements, State, Timeout, $Class {
 }

@@ -1,6 +1,17 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class Elements extends base_1.Base {
+    async getElement(selector, parent) {
+        try {
+            return this._.element(selector, parent);
+        }
+        catch (err) {
+            if (err.state && err.state == 7)
+                return Promise.resolve(null);
+            throw err;
+        }
+    }
     async element(selector, parent) {
         const using = 'css selector';
         let el;
@@ -42,8 +53,10 @@ class Elements extends base_1.Base {
         }
         return els || (Array.isArray(selector) ? selector : [selector]);
     }
-    async elementId(selector) {
-        return (await this._.element(selector)).ELEMENT;
+    async elementId(selector, parent) {
+        if (typeof selector !== 'string')
+            return selector.ELEMENT;
+        return (await this._.element(selector, parent)).ELEMENT;
     }
 }
 exports.Elements = Elements;

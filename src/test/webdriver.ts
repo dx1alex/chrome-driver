@@ -1,14 +1,6 @@
 import { Webdriver } from '../webdriver'
 
-const wd = new Webdriver({
-  url: 'http://127.0.0.1:9515',
-  // debug: true
-  // debug: {
-  //   //disableLog: true,
-  //   logId: 'test',
-  //   stderr: 'err.log'
-  // }
-})
+const wd = new Webdriver('http://127.0.0.1:9515')
 
 main()
 async function main() {

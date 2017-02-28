@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = require("../helpers");
 const base_1 = require("./base");
 class Input extends base_1.Base {

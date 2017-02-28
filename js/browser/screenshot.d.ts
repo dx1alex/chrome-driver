@@ -1,8 +1,8 @@
-import { Base, Selector } from "./base";
+import { Base, Selector } from './base';
 import { Elements } from './elements';
-import { Exec } from "./exec";
-import { Getter } from "./getter";
-import { Scroll } from "./scroll";
+import { Exec } from './exec';
+import { Getter } from './getter';
+import { Scroll } from './scroll';
 export interface Screenshot extends Scroll, Getter, Elements, Exec {
 }
 export declare class Screenshot extends Base {

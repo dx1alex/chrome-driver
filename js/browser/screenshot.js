@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const base_1 = require("./base");
 class Screenshot extends base_1.Base {

@@ -1,7 +1,15 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 const state_1 = require("./state");
 class Utils extends base_1.Base {
+    pause(options, value) {
+        if (typeof options === 'string') {
+            this.options.pause[options] = value;
+            return;
+        }
+        Object.assign(this.options.pause, options);
+    }
     sleep(ms, ms2 = 0) {
         if (ms2) {
             ms = (Math.random() * Math.abs(ms2 - ms) | 0) + Math.min(ms, ms2) + 1;
@@ -58,7 +66,7 @@ class Utils extends base_1.Base {
                     const obj = {
                         [name]: () => browser[state](el, ...(args.slice(1)))
                     };
-                    return this._thisProxy.waitUntil(obj[name], timeoutOrSettings, interval);
+                    return this._.waitUntil(obj[name], timeoutOrSettings, interval);
                 };
             }
         });

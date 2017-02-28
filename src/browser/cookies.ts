@@ -1,4 +1,4 @@
-import { Base, Cookie } from "./base";
+import { Base, Cookie } from './base'
 
 export class Cookies extends Base {
 
