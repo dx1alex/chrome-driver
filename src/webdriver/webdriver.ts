@@ -24,11 +24,16 @@ export class Webdriver {
     }
 
     for (const command of Object.keys(commands)) {
-      this[command] = (data: any) => {
+      Webdriver.prototype[command] = (data: any) => {
         let path: string = commands[command][1]
         path = path.replace(/:([a-zA-Z_$]+)/g, (m, p) => {
           if (p === 'sessionId') {
-            if (!this.sessionId) throw new Error(`No set sessionId`)
+            if (data && 'sessionId' in data) {
+              return data['sessionId']
+            }
+            if (!this.sessionId) {
+              throw new Error(`No set sessionId`)
+            }
             return this.sessionId
           }
           if (!(p in data)) throw new TypeError(`Invalid argument ${p} from ${command}`)
@@ -229,89 +234,89 @@ export interface Webdriver extends WebdriverCommands { }
 export interface WebdriverCommands {
   initSession(capabilities: { desiredCapabilities: Capabilities }): Promise<{ sessionId: string, value: Capabilities }>
   status(): Promise<any>
-  getSession(options: { sessionId: string }): Promise<Capabilities>
   getSessions(): Promise<Array<{ id: string, capabilities: Capabilities }>>
-  deleteSession(options: { sessionId: string }): Promise<void>
-  setTimeouts(options: { type: keyof Timeouts, ms: number }): Promise<void>
-  setAsyncScriptTimeout(options: { ms: number }): Promise<void>
-  setImplicitWaitTimeout(options: { ms: number }): Promise<void>
-  getWindowHandle(): Promise<string>
-  getWindowHandles(): Promise<string[]>
-  switchToWindow(options: { name: string }): Promise<void>
-  closeWindow(): Promise<void>
-  setWindowSize(options: { windowHandle: string, width: number, height: number }): Promise<any>
-  getWindowSize(options: { windowHandle: string }): Promise<{ width: number, height: number }>
-  setWindowPosition(options: { windowHandle: string, x: number, y: number }): Promise<any>
-  getWindowPosition(options: { windowHandle: string }): Promise<{ x: number, y: number }>
-  maximizeWindow(options: { windowHandle: string | 'current' }): Promise<void>
-  switchToFrame(options: { id: string | number | null | { ELEMENT: string } }): Promise<void>
-  switchToParentFrame(): Promise<void>
-  getCurrentURL(): Promise<string>
-  go(options: { url: string }): Promise<void>
-  goForward(): Promise<void>
-  goBack(): Promise<void>
-  refresh(): Promise<void>
-  getSource(): Promise<string>
-  getTitle(): Promise<string>
-  getAllCookies(): Promise<Cookie[]>
-  setCookie(options: { cookie: Cookie }): Promise<void>
-  deleteAllCookies(): Promise<void>
-  deleteCookie(options: { name: string }): Promise<void>
-  setAlertText(options: { text: string }): Promise<void>
-  getAlertText(): Promise<string>
-  acceptAlert(): Promise<void>
-  dismissAlert(): Promise<void>
-  keys(options: { value: string[] }): Promise<void>
-  executeScript(options: { script: string, args?: any[] }): Promise<any>
-  executeAsyncScript(options: { script: string, args: any[] }): Promise<any>
-  screenshot(): Promise<string>
-  findElement(options: { using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }>
-  findElements(options: { using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }[]>
-  getActiveElement(): Promise<{ ELEMENT: string }>
-  findChildElement(options: { id: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }>
-  findChildElements(options: { id: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }[]>
-  click(options: { id: string }): Promise<void>
-  clear(options: { id: string }): Promise<void>
-  submit(options: { id: string }): Promise<void>
-  keysElement(options: { id: string, value: string[] }): Promise<void>
-  getElementText(options: { id: string }): Promise<string>
-  getElementTagName(options: { id: string }): Promise<string>
-  getElementAttribute(options: { id: string }): Promise<string>
-  getElementCssProperty(options: { id: string, propertyName: string }): Promise<string>
-  getElementSize(options: { id: string }): Promise<{ width: number, height: number }>
-  getElementLocation(options: { id: string }): Promise<{ x: number, y: number }>
-  getElementLocationInView(options: { id: string }): Promise<{ x: number, y: number }>
-  isElementSelected(options: { id: string }): Promise<boolean>
-  isElementEnabled(options: { id: string }): Promise<boolean>
-  isElementEqual(options: { id: string, other: string }): Promise<boolean>
-  isElementDysplayed(options: { id: string }): Promise<boolean>
-  mouseMoveTo(options: { element?: string, xoffset?: number, yoffset?: number }): Promise<void>
-  mouseDoubleClick(): Promise<void>
-  mouseClick(options: { button?: 0 | 1 | 2 }): Promise<void>
-  mouseDown(options: { button?: 0 | 1 | 2 }): Promise<void>
-  mouseUp(options: { button?: 0 | 1 | 2 }): Promise<void>
-  touchClick(options: { element: string }): Promise<void>
-  touchDown(options: { x: number, y: number }): Promise<void>
-  touchUp(options: { x: number, y: number }): Promise<void>
-  touchMove(options: { x: number, y: number }): Promise<void>
-  touchScroll(options: { element?: string, xoffset: number, yoffset: number }): Promise<void>
-  touchDoubleClick(options: { element: string }): Promise<void>
-  touchLongClick(options: { element: string }): Promise<void>
-  touchFlick(options: { element?: string, xoffset?: number, yoffset?: number, speed?: number, xspeed?: number, yspeed?: number }): Promise<void>
-  getOrientation(): Promise<'LANDSCAPE' | 'PORTRAIT'>
-  setOrientation(options: { orientation: 'LANDSCAPE' | 'PORTRAIT' }): Promise<void>
-  getGeoLocation(): Promise<{ latitude: number, longitude: number, altitude: number }>
-  setGeoLocation(options: { latitude: number, longitude: number, altitude: number }): Promise<void>
-  getLocalStorageKeys(): Promise<string[]>
-  setLocalStorage(options: { key: string, value: string }): Promise<void>
-  clearLocalStorage(): Promise<void>
-  getLocalStorageValue(options: { key: string }): Promise<string>
-  deleteLocalStorageValue(options: { key: string }): Promise<void>
-  getLocalStorageSize(): Promise<number>
-  getSessionStorageKeys(): Promise<string[]>
-  setSessionStorage(options: { key: string, value: string }): Promise<void>
-  deleteSessionStorage(): Promise<void>
-  getSessionStorageValue(options: { key: string }): Promise<string>
-  deleteSessionStorageValue(options: { key: string }): Promise<void>
-  getSessionStorageSize(): Promise<number>
+  getSession(options?: { sessionId: string }): Promise<Capabilities>
+  deleteSession(options?: { sessionId: string }): Promise<void>
+  setTimeouts(options: { sessionId?: string, type: keyof Timeouts, ms: number }): Promise<void>
+  setAsyncScriptTimeout(options: { sessionId?: string, ms: number }): Promise<void>
+  setImplicitWaitTimeout(options: { sessionId?: string, ms: number }): Promise<void>
+  getWindowHandle(options?: { sessionId: string }): Promise<string>
+  getWindowHandles(options?: { sessionId: string }): Promise<string[]>
+  switchToWindow(options: { sessionId?: string, name: string }): Promise<void>
+  closeWindow(options?: { sessionId: string }): Promise<void>
+  setWindowSize(options: { sessionId?: string, windowHandle: string, width: number, height: number }): Promise<any>
+  getWindowSize(options: { sessionId?: string, windowHandle: string }): Promise<{ width: number, height: number }>
+  setWindowPosition(options: { sessionId?: string, windowHandle: string, x: number, y: number }): Promise<any>
+  getWindowPosition(options: { sessionId?: string, windowHandle: string }): Promise<{ x: number, y: number }>
+  maximizeWindow(options: { sessionId?: string, windowHandle: string | 'current' }): Promise<void>
+  switchToFrame(options: { sessionId?: string, id: string | number | null | { ELEMENT: string } }): Promise<void>
+  switchToParentFrame(options?: { sessionId: string }): Promise<void>
+  getCurrentURL(options?: { sessionId: string }): Promise<string>
+  go(options: { sessionId?: string, url: string }): Promise<void>
+  goForward(options?: { sessionId: string }): Promise<void>
+  goBack(options?: { sessionId: string }): Promise<void>
+  refresh(options?: { sessionId: string }): Promise<void>
+  getSource(options?: { sessionId: string }): Promise<string>
+  getTitle(options?: { sessionId: string }): Promise<string>
+  getAllCookies(options?: { sessionId: string }): Promise<Cookie[]>
+  setCookie(options: { sessionId?: string, cookie: Cookie }): Promise<void>
+  deleteAllCookies(options?: { sessionId: string }): Promise<void>
+  deleteCookie(options: { sessionId?: string, name: string }): Promise<void>
+  setAlertText(options: { sessionId?: string, text: string }): Promise<void>
+  getAlertText(options?: { sessionId: string }): Promise<string>
+  acceptAlert(options?: { sessionId: string }): Promise<void>
+  dismissAlert(options?: { sessionId: string }): Promise<void>
+  keys(options: { sessionId?: string, value: string[] }): Promise<void>
+  executeScript(options: { sessionId?: string, script: string, args?: any[] }): Promise<any>
+  executeAsyncScript(options: { sessionId?: string, script: string, args: any[] }): Promise<any>
+  screenshot(options?: { sessionId: string }): Promise<string>
+  findElement(options: { sessionId?: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }>
+  findElements(options: { sessionId?: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }[]>
+  getActiveElement(options?: { sessionId: string }): Promise<{ ELEMENT: string }>
+  findChildElement(options: { sessionId?: string, id: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }>
+  findChildElements(options: { sessionId?: string, id: string, using: LocatorStrategy, value: string }): Promise<{ ELEMENT: string }[]>
+  click(options: { sessionId?: string, id: string }): Promise<void>
+  clear(options: { sessionId?: string, id: string }): Promise<void>
+  submit(options: { sessionId?: string, id: string }): Promise<void>
+  keysElement(options: { sessionId?: string, id: string, value: string[] }): Promise<void>
+  getElementText(options: { sessionId?: string, id: string }): Promise<string>
+  getElementTagName(options: { sessionId?: string, id: string }): Promise<string>
+  getElementAttribute(options: { sessionId?: string, id: string }): Promise<string>
+  getElementCssProperty(options: { sessionId?: string, id: string, propertyName: string }): Promise<string>
+  getElementSize(options: { sessionId?: string, id: string }): Promise<{ width: number, height: number }>
+  getElementLocation(options: { sessionId?: string, id: string }): Promise<{ x: number, y: number }>
+  getElementLocationInView(options: { sessionId?: string, id: string }): Promise<{ x: number, y: number }>
+  isElementSelected(options: { sessionId?: string, id: string }): Promise<boolean>
+  isElementEnabled(options: { sessionId?: string, id: string }): Promise<boolean>
+  isElementEqual(options: { sessionId?: string, id: string, other: string }): Promise<boolean>
+  isElementDysplayed(options: { sessionId?: string, id: string }): Promise<boolean>
+  mouseMoveTo(options: { sessionId?: string, element?: string, xoffset?: number, yoffset?: number }): Promise<void>
+  mouseDoubleClick(options?: { sessionId: string }): Promise<void>
+  mouseClick(options: { sessionId?: string, button?: 0 | 1 | 2 }): Promise<void>
+  mouseDown(options: { sessionId?: string, button?: 0 | 1 | 2 }): Promise<void>
+  mouseUp(options: { sessionId?: string, button?: 0 | 1 | 2 }): Promise<void>
+  touchClick(options: { sessionId?: string, element: string }): Promise<void>
+  touchDown(options: { sessionId?: string, x: number, y: number }): Promise<void>
+  touchUp(options: { sessionId?: string, x: number, y: number }): Promise<void>
+  touchMove(options: { sessionId?: string, x: number, y: number }): Promise<void>
+  touchScroll(options: { sessionId?: string, element?: string, xoffset: number, yoffset: number }): Promise<void>
+  touchDoubleClick(options: { sessionId?: string, element: string }): Promise<void>
+  touchLongClick(options: { sessionId?: string, element: string }): Promise<void>
+  touchFlick(options: { sessionId?: string, element?: string, xoffset?: number, yoffset?: number, speed?: number, xspeed?: number, yspeed?: number }): Promise<void>
+  getOrientation(options?: { sessionId: string }): Promise<'LANDSCAPE' | 'PORTRAIT'>
+  setOrientation(options: { sessionId?: string, orientation: 'LANDSCAPE' | 'PORTRAIT' }): Promise<void>
+  getGeoLocation(options?: { sessionId: string }): Promise<{ latitude: number, longitude: number, altitude: number }>
+  setGeoLocation(options: { sessionId?: string, latitude: number, longitude: number, altitude: number }): Promise<void>
+  getLocalStorageKeys(options?: { sessionId: string }): Promise<string[]>
+  setLocalStorage(options: { sessionId?: string, key: string, value: string }): Promise<void>
+  clearLocalStorage(options?: { sessionId: string }): Promise<void>
+  getLocalStorageValue(options: { sessionId?: string, key: string }): Promise<string>
+  deleteLocalStorageValue(options: { sessionId?: string, key: string }): Promise<void>
+  getLocalStorageSize(options?: { sessionId: string }): Promise<number>
+  getSessionStorageKeys(options?: { sessionId: string }): Promise<string[]>
+  setSessionStorage(options: { sessionId?: string, key: string, value: string }): Promise<void>
+  deleteSessionStorage(options?: { sessionId: string }): Promise<void>
+  getSessionStorageValue(options: { sessionId?: string, key: string }): Promise<string>
+  deleteSessionStorageValue(options: { sessionId?: string, key: string }): Promise<void>
+  getSessionStorageSize(options?: { sessionId: string }): Promise<number>
 }

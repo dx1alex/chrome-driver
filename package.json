@@ -1,14 +1,15 @@
 {
-    "name": "chrome-driver",
-    "version": "0.1.0",
-    "description": "chrome-driver",
-    "main": "js/index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "dx1",
-    "license": "MIT",
-    "dependencies": {
-        "@types/node": "^7.0.5"
-    }
+  "name": "chrome-driver",
+  "version": "1.0.0",
+  "description": "chrome-driver",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dx1",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "0.0.40",
+    "@types/node": "^7.0.5"
+  }
 }

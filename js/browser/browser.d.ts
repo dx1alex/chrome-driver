@@ -26,7 +26,7 @@ export declare class Browser extends Base {
     protected static DEFAULT_WAIT_TIMEOUT: number;
     protected static DEFAULT_WAIT_INTERVAL: number;
     protected static MAX_COMMAND_HISTORY_ITEMS: number;
-    static KEY: {
+    static readonly KEY: {
         null: string;
         cancel: string;
         help: string;

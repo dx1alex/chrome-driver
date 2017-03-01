@@ -20,12 +20,16 @@ class Webdriver {
             this.logStream = this.options.log;
         }
         for (const command of Object.keys(commands_1.default)) {
-            this[command] = (data) => {
+            Webdriver.prototype[command] = (data) => {
                 let path = commands_1.default[command][1];
                 path = path.replace(/:([a-zA-Z_$]+)/g, (m, p) => {
                     if (p === 'sessionId') {
-                        if (!this.sessionId)
+                        if (data && 'sessionId' in data) {
+                            return data['sessionId'];
+                        }
+                        if (!this.sessionId) {
                             throw new Error(`No set sessionId`);
+                        }
                         return this.sessionId;
                     }
                     if (!(p in data))

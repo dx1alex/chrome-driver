@@ -5,9 +5,9 @@ export interface $Class extends Elements {
 }
 export declare class $Class extends Base {
     private static _$List;
-    $(selector: Selector): Browser$;
+    $(selector: Selector): $Element;
 }
-export interface Browser$ {
+export interface $Element {
     script(code: string | Function, ...args: any[]): Promise<any>;
     scriptAll(code: string | Function, ...args: any[]): Promise<any>;
     scriptAllAsync(code: string | Function, ...args: any[]): Promise<any>;

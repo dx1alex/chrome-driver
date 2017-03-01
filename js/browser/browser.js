@@ -106,7 +106,7 @@ class Browser extends base_1.Base {
         return this.webdriver.status();
     }
     async quit() {
-        await this.webdriver.deleteSession({ sessionId: this.sessionId });
+        await this.webdriver.deleteSession();
         this.started = false;
     }
     async start(options = {}) {
@@ -142,7 +142,7 @@ class Browser extends base_1.Base {
             }
         }
         if (init.url) {
-            await this._.url(init.url);
+            await this._.go(init.url);
         }
     }
 }

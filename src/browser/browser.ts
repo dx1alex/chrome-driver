@@ -51,7 +51,7 @@ export class Browser extends Base {
   protected static DEFAULT_WAIT_INTERVAL = 1000
   protected static MAX_COMMAND_HISTORY_ITEMS = 100
 
-  static KEY = UNICODE_KEYS
+  static readonly KEY = UNICODE_KEYS
 
   private _numCommand = 0
 
@@ -154,7 +154,7 @@ export class Browser extends Base {
   }
 
   async quit() {
-    await this.webdriver.deleteSession({ sessionId: this.sessionId })
+    await this.webdriver.deleteSession()
     this.started = false
   }
 
@@ -195,7 +195,7 @@ export class Browser extends Base {
     }
 
     if (init.url) {
-      await this._.url(init.url)
+      await this._.go(init.url)
     }
   }
 

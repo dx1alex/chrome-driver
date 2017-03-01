@@ -6,11 +6,26 @@ export interface Exec extends Elements {
 
 export class Exec extends Base {
 
+  extension(code: string | Function, ...args: any[]) {
+    let script = '' + code
+
+    if (typeof code === 'function') {
+      script = `return (${script}).apply(null, arguments)`
+    }
+
+    return this._.executeAsync(async (code: string, args: any[]) => {
+      const extensionId = '9d009613-1f79-4455-b5d2-f5fe09bbe044'
+      const res = await sendMessageToExtension(extensionId, { code, args })
+      if (res.error) throw res.error
+      return res.message
+    }, script, args)
+  }
+
   execute(code: string | Function, ...args: any[]) {
     let script = '' + code
     if (typeof code === 'function') {
       if (script.startsWith('async')) {
-        return this.executeAsync(code, args)
+        return this.executeAsync(code, ...args)
       }
       script = `return (${script}).apply(null, arguments)`
     }
@@ -90,3 +105,5 @@ export class Exec extends Base {
   // let sleepOnBrowser = bro.fn.execute(async (ms: number) => new Promise(resolve => setTimeout(resolve, ms)))
   // await sleepOnBrowser(3000)
 }
+
+declare function sendMessageToExtension(id: string, message: any): Promise<any>

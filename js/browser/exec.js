@@ -2,11 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const base_1 = require("./base");
 class Exec extends base_1.Base {
+    extension(code, ...args) {
+        let script = '' + code;
+        if (typeof code === 'function') {
+            script = `return (${script}).apply(null, arguments)`;
+        }
+        return this._.executeAsync(async (code, args) => {
+            const extensionId = '9d009613-1f79-4455-b5d2-f5fe09bbe044';
+            const res = await sendMessageToExtension(extensionId, { code, args });
+            if (res.error)
+                throw res.error;
+            return res.message;
+        }, script, args);
+    }
     execute(code, ...args) {
         let script = '' + code;
         if (typeof code === 'function') {
             if (script.startsWith('async')) {
-                return this.executeAsync(code, args);
+                return this.executeAsync(code, ...args);
             }
             script = `return (${script}).apply(null, arguments)`;
         }

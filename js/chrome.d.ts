@@ -2,6 +2,8 @@ import { Browser, Capabilities, PauseSettings, Timeouts } from './browser';
 export declare class Chrome extends Browser {
     protected static _no_proxy_list: string[];
     static default_prefs: object;
+    static default_timeouts: Timeouts;
+    static default_extensions: string[];
     static default_args: string[];
     constructor(chromeOptions: ChromeOptions);
     start(startOptions?: ChromeStartOptions): Promise<void>;
@@ -10,20 +12,25 @@ export declare class Chrome extends Browser {
     setArgs(args: {
         [key: string]: string | boolean;
     }): number;
+    clearProxy(): Promise<any>;
+    setProxy(proxy?: string): Promise<any>;
+    saveAsMHTML(filePath: string): Promise<{}>;
+    dump(dir?: string): Promise<string[]>;
 }
 export interface ChromeOptions extends ChromeStartOptions {
     remote: string;
     log?: string | boolean;
     verbose?: boolean;
+    noCommandHistory?: boolean;
     waitTimeout?: number;
     waitInterval?: number;
     pause?: PauseSettings;
-    noCommandHistory?: boolean;
 }
 export interface ChromeStartOptions extends ChromeOptionsCapabilities {
     proxy?: any;
     url?: string;
     maximaze?: boolean;
+    window?: number[];
     windowSize?: number[];
     windowPosition?: number[];
     timeouts?: Timeouts;

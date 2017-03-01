@@ -14,7 +14,7 @@ export class $Class extends Base {
     'isSelected', 'isEnabled', 'isFocused', 'isReadonly', 'isVisible', 'hasText', 'hasClass', 'hasAttribute'
   ]
 
-  $(selector: Selector): Browser$ {
+  $(selector: Selector): $Element {
     return new Proxy(<any>this, {
       get: (browser, command, r) => {
         if (typeof browser[command] === 'function' && $Class._$List.includes(<string>command)) {
@@ -29,8 +29,8 @@ export class $Class extends Base {
 
 }
 
-//type Keys$ = keyof Browser$ // ctrl+c
-export interface Browser$ {
+//type Keys$ = keyof $Element // ctrl+c
+export interface $Element {
   script(code: string | Function, ...args: any[]): Promise<any>
   scriptAll(code: string | Function, ...args: any[]): Promise<any>
   scriptAllAsync(code: string | Function, ...args: any[]): Promise<any>
