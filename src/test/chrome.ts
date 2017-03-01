@@ -20,6 +20,12 @@ async function main() {
     console.log(bro.capabilities)
 
     await bro.go('http://ya.ru')
+    const tab = await bro.getTab()
+    await bro.newTab(true)
+    await bro.go('http://vk.com')
+    await bro.switchTab(tab, true)
+    await bro.go('http://yandex.ru')
+
 
     console.log(bro.lastCommand())
   } catch (err) {

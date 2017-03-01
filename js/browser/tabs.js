@@ -31,8 +31,10 @@ class Tabs extends base_1.Base {
     getTabs() {
         return this.webdriver.getWindowHandles();
     }
-    switchTab(name) {
-        return this.webdriver.switchToWindow({ name });
+    async switchTab(name, ontop) {
+        await this.webdriver.switchToWindow({ name });
+        if (ontop)
+            return this.webdriver.screenshot();
     }
     async closeTab(name) {
         const tab = await this._.getTab();
@@ -68,6 +70,9 @@ class Tabs extends base_1.Base {
         if (switchTo)
             await this._.switchTab(newtab);
         return newtab;
+    }
+    onTop() {
+        return this.webdriver.screenshot();
     }
 }
 exports.Tabs = Tabs;

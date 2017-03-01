@@ -20,8 +20,9 @@ export declare class Tabs extends Base {
     }>;
     getTab(): Promise<string>;
     getTabs(): Promise<string[]>;
-    switchTab(name: string): Promise<void>;
+    switchTab(name: string, ontop?: boolean): Promise<string>;
     closeTab(name?: string): Promise<void>;
     newTab(switchTo?: boolean): Promise<string>;
     newTab(url: string, switchTo?: boolean): Promise<string>;
+    onTop(): Promise<string>;
 }

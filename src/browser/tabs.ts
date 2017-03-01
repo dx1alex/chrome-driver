@@ -43,8 +43,9 @@ export class Tabs extends Base {
     return this.webdriver.getWindowHandles()
   }
 
-  switchTab(name: string) {
-    return this.webdriver.switchToWindow({ name })
+  async switchTab(name: string, ontop?: boolean) {
+    await this.webdriver.switchToWindow({ name })
+    if (ontop) return this.webdriver.screenshot()
   }
 
   async closeTab(name?: string) {
@@ -81,6 +82,10 @@ export class Tabs extends Base {
     const newtab = tabs[tabs.length - 1]
     if (switchTo) await this._.switchTab(newtab)
     return newtab
+  }
+
+  onTop() {
+    return this.webdriver.screenshot()
   }
 
 }
