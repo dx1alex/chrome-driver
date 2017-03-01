@@ -34,7 +34,7 @@ class Tabs extends base_1.Base {
     async switchTab(name, ontop) {
         await this.webdriver.switchToWindow({ name });
         if (ontop)
-            return this.webdriver.screenshot();
+            await this.webdriver.screenshot();
     }
     async closeTab(name) {
         const tab = await this._.getTab();
