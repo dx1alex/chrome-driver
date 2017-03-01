@@ -1,8 +1,8 @@
 {
     "name": "chrome-driver",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "chrome-driver",
-    "main": "js/index.js",
+    "main": "js/index",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
