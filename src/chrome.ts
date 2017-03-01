@@ -30,7 +30,7 @@ export class Chrome extends Browser {
   }
   static default_extensions: string[] = [driverExtension]
   static default_args = [
-    `load-extension=${extensionsDir}/driver`,
+    //`load-extension=${extensionsDir}/driver`,
     'disable-background-networking',
     'disable-client-side-phishing-detection',
     'disable-component-update',

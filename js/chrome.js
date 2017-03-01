@@ -233,7 +233,7 @@ Chrome.default_timeouts = {
 };
 Chrome.default_extensions = [driverExtension];
 Chrome.default_args = [
-    `load-extension=${extensionsDir}/driver`,
+    //`load-extension=${extensionsDir}/driver`,
     'disable-background-networking',
     'disable-client-side-phishing-detection',
     'disable-component-update',
