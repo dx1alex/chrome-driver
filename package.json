@@ -1,13 +1,13 @@
 {
     "name": "chrome-driver",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "chrome-driver",
     "main": "js/index",
     "types": "js/index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "dx1",
+    "author": "dx1alex",
     "license": "MIT",
     "repository": {
         "type": "git",
