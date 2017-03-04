@@ -6,21 +6,6 @@ export interface Exec extends Elements {
 
 export class Exec extends Base {
 
-  extension(code: string | Function, ...args: any[]) {
-    let script = '' + code
-
-    if (typeof code === 'function') {
-      script = `return (${script}).apply(null, arguments)`
-    }
-
-    return this._.executeAsync(async (code: string, args: any[]) => {
-      const extensionId = '9d009613-1f79-4455-b5d2-f5fe09bbe044'
-      const res = await sendMessageToExtension(extensionId, { code, args })
-      if (res.error) throw res.error
-      return res.message
-    }, script, args)
-  }
-
   execute(code: string | Function, ...args: any[]) {
     let script = '' + code
     if (typeof code === 'function') {
@@ -54,12 +39,12 @@ export class Exec extends Base {
     if (Array.isArray(selector)) {
       sel = []
       for (let s of selector) {
-        sel.push(typeof s === 'string' ? await this._.element(s) : s)
+        sel.push(typeof s === 'string' ? await this.element(s) : s)
       }
     } else {
-      sel = typeof selector === 'string' ? await this._.element(selector) : selector
+      sel = typeof selector === 'string' ? await this.element(selector) : selector
     }
-    return this._.execute(code, sel, ...args)
+    return this.execute(code, sel, ...args)
   }
 
   async scriptAll(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
@@ -67,12 +52,12 @@ export class Exec extends Base {
     if (Array.isArray(selector)) {
       sel = []
       for (let s of selector) {
-        sel.concat(typeof s === 'string' ? await this._.element(s) : (Array.isArray(s) ? s : [s]))
+        sel.concat(typeof s === 'string' ? await this.element(s) : (Array.isArray(s) ? s : [s]))
       }
     } else {
-      sel = typeof selector === 'string' ? await this._.elements(selector) : [selector]
+      sel = typeof selector === 'string' ? await this.elements(selector) : [selector]
     }
-    return this._.execute(code, sel, ...args)
+    return this.execute(code, sel, ...args)
   }
 
   async scriptAllAsync(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
@@ -80,12 +65,12 @@ export class Exec extends Base {
     if (Array.isArray(selector)) {
       sel = []
       for (let s of selector) {
-        sel.concat(typeof s === 'string' ? await this._.element(s) : (Array.isArray(s) ? s : [s]))
+        sel.concat(typeof s === 'string' ? await this.element(s) : (Array.isArray(s) ? s : [s]))
       }
     } else {
-      sel = typeof selector === 'string' ? await this._.elements(selector) : [selector]
+      sel = typeof selector === 'string' ? await this.elements(selector) : [selector]
     }
-    return this._.executeAsync(code, sel, ...args)
+    return this.executeAsync(code, sel, ...args)
   }
 
   async scriptAsync(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
@@ -93,17 +78,15 @@ export class Exec extends Base {
     if (Array.isArray(selector)) {
       sel = []
       for (let s of selector) {
-        sel.push(typeof s === 'string' ? await this._.element(s) : s)
+        sel.push(typeof s === 'string' ? await this.element(s) : s)
       }
     } else {
-      sel = typeof selector === 'string' ? await this._.element(selector) : selector
+      sel = typeof selector === 'string' ? await this.element(selector) : selector
     }
-    return this._.executeAsync(code, sel, ...args)
+    return this.executeAsync(code, sel, ...args)
   }
 
   //TODO fn
   // let sleepOnBrowser = bro.fn.execute(async (ms: number) => new Promise(resolve => setTimeout(resolve, ms)))
   // await sleepOnBrowser(3000)
 }
-
-declare function sendMessageToExtension(id: string, message: any): Promise<any>

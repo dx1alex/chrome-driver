@@ -21,37 +21,37 @@ class Input extends base_1.Base {
             }
         }
         if (selector) {
-            const id = await this._.elementId(selector);
+            const id = await this.elementId(selector);
             await this.webdriver.keysElement({ value, id });
-            await this._.sleep(pause || this.options.pause.keys);
+            await this.sleep(pause || this.options.pause.keys);
             if (submit)
-                await this._.submit({ ELEMENT: id }, submitPause);
+                await this.submit({ ELEMENT: id }, submitPause);
             return;
         }
         return this.webdriver.keys({ value });
     }
     async type(selector, ...keys) {
-        const el = await this._.element(selector);
-        await this._.empty(el);
-        return this._.keys(el, ...keys);
+        const el = await this.element(selector);
+        await this.empty(el);
+        return this.keys(el, ...keys);
     }
     sendKeys(...keys) {
-        return this._.keys(null, ...keys);
+        return this.keys(null, ...keys);
     }
     hotkeys(...keys) {
-        return this._.keys(null, '\uE000', ...keys, '\uE000');
+        return this.keys(null, '\uE000', ...keys, '\uE000');
     }
     async clear(selector) {
-        return this.webdriver.clear({ id: await this._.elementId(selector) });
+        return this.webdriver.clear({ id: await this.elementId(selector) });
     }
     async empty(selector) {
-        const id = await this._.elementId(selector);
+        const id = await this.elementId(selector);
         try {
             await this.webdriver.clear({ id });
         }
         catch (err) {
             if (err.statusCode == 12) {
-                await this._.script({ ELEMENT: id }, (el) => {
+                await this.script({ ELEMENT: id }, (el) => {
                     el.innerHTML = '';
                 });
             }
@@ -61,34 +61,34 @@ class Input extends base_1.Base {
         }
     }
     async submit(selector, pause) {
-        await this.webdriver.submit({ id: await this._.elementId(selector) });
-        await this._.sleep(pause || this.options.pause.submit);
+        await this.webdriver.submit({ id: await this.elementId(selector) });
+        await this.sleep(pause || this.options.pause.submit);
     }
     async check(checkbox, pause) {
-        const id = await this._.elementId(checkbox);
+        const id = await this.elementId(checkbox);
         if (!(await this.webdriver.isElementSelected({ id }))) {
-            await this._.click({ ELEMENT: id }, pause);
+            await this.click({ ELEMENT: id }, pause);
             return true;
         }
         return false;
     }
     async uncheck(checkbox, pause) {
-        const id = await this._.elementId(checkbox);
+        const id = await this.elementId(checkbox);
         if (await this.webdriver.isElementSelected({ id })) {
-            await this._.click({ ELEMENT: id }, pause);
+            await this.click({ ELEMENT: id }, pause);
             return true;
         }
         return false;
     }
     async uploadFile(input_file, filePath, pause) {
-        await this.webdriver.keysElement({ id: await this._.elementId(input_file), value: [filePath] });
-        await this._.sleep(pause || this.options.pause.upload);
+        await this.webdriver.keysElement({ id: await this.elementId(input_file), value: [filePath] });
+        await this.sleep(pause || this.options.pause.upload);
     }
     select(select, option, submit, pause) {
-        return this._.selectUnselect(true, select, option, submit, pause);
+        return this.selectUnselect(true, select, option, submit, pause);
     }
     unselect(select, option, submit, pause) {
-        return this._.selectUnselect(false, select, option, submit, pause);
+        return this.selectUnselect(false, select, option, submit, pause);
     }
     async selectUnselect(check, select, option, ...submitAndPause) {
         let submit, pause = 0, submitPause = 0;
@@ -107,28 +107,28 @@ class Input extends base_1.Base {
         const options = Array.isArray(option) ? option : [option];
         for (let option of options) {
             if (typeof option === 'number') {
-                const els = await this._.elements('option', select);
+                const els = await this.elements('option', select);
                 el = els[option];
             }
             else if (typeof option === 'string') {
-                el = await this._.element(`option[value="${option}"]`, select);
+                el = await this.element(`option[value="${option}"]`, select);
             }
             else {
                 let attrs = '';
                 for (const [attr, value] of Object.entries(option)) {
                     attrs += `[${attr}="${value}"]`;
                 }
-                el = await this._.element(`option${attrs}`, select);
+                el = await this.element(`option${attrs}`, select);
             }
             if (check) {
-                await this._.check(el, pause);
+                await this.check(el, pause);
             }
             else {
-                await this._.uncheck(el, pause);
+                await this.uncheck(el, pause);
             }
         }
         if (submit)
-            await this._.submit(el, submitPause);
+            await this.submit(el, submitPause);
     }
     async form(form, inputs, ...submitAndPause) {
         let submit, pause = 0, submitPause = 0;
@@ -143,51 +143,51 @@ class Input extends base_1.Base {
                     pause = typeof submit === 'boolean' ? pause : val;
             }
         }
-        form = await this._.element(form);
+        form = await this.element(form);
         for (const [name, value] of Object.entries(inputs)) {
-            let els = await this._.elements(`[name="${name}"]`, form);
+            let els = await this.elements(`[name="${name}"]`, form);
             if (!els[0]) {
-                els = await this._.elements(`[id="${name}"]`, form);
+                els = await this.elements(`[id="${name}"]`, form);
             }
             const el = els[0];
-            const type = await this._.attr(el, 'type');
+            const type = await this.attr(el, 'type');
             if (['button', 'image', 'reset', 'submit'].includes(type)) {
                 if (value)
-                    await this._.click(el, pause);
+                    await this.click(el, pause);
             }
             else if (type === 'radio') {
                 for (let el of els) {
-                    const val = await this._.attr(el, 'value');
+                    const val = await this.attr(el, 'value');
                     if (val == value) {
-                        await this._.check(el, pause);
+                        await this.check(el, pause);
                         break;
                     }
                 }
             }
             else if (type === 'checkbox') {
                 if (value)
-                    await this._.check(el, pause);
+                    await this.check(el, pause);
                 else
-                    await this._.uncheck(el, pause);
+                    await this.uncheck(el, pause);
             }
             else if (type === 'file') {
-                await this._.uploadFile(el, value, pause);
+                await this.uploadFile(el, value, pause);
             }
             else if (type === 'hidden') {
-                await this._.script(el, (el, val) => el.setAttribute('value', val), value);
+                await this.script(el, (el, val) => el.setAttribute('value', val), value);
             }
             else {
-                const tag = await this._.tagName(el);
+                const tag = await this.tagName(el);
                 if (tag === 'select') {
-                    await this._.select(el, value, pause);
+                    await this.select(el, value, pause);
                 }
                 else {
-                    await this._.type(el, value, pause);
+                    await this.type(el, value, pause);
                 }
             }
         }
         if (submit)
-            await this._.submit(form, submitPause);
+            await this.submit(form, submitPause);
     }
 }
 exports.Input = Input;

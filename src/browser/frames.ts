@@ -7,7 +7,7 @@ export interface Frames extends Elements {
 export class Frames extends Base {
 
   async switchFrame(frame: Selector | number | null) {
-    const id = typeof frame === 'number' || frame === null ? frame : await this._.elementId(frame)
+    const id = typeof frame === 'number' || frame === null ? frame : await this.elementId(frame)
     await this.webdriver.switchToFrame({ id })
   }
 

@@ -16,9 +16,10 @@ export class Webdriver {
 
 
     if (this.options.log && typeof this.options.log !== 'object') {
-      this.logStream = typeof this.options.log === 'boolean'
-        ? process.stdout
-        : fs.createWriteStream(this.options.log, { flags: 'a' })
+      this.logStream = typeof this.options.log === 'boolean' ? process.stdout
+        : /^console/.test(this.options.log) ? <any>{ write: console[this.options.log.split('.')[1] || 'log'] }
+          : typeof this.options.log === 'string' ? fs.createWriteStream(this.options.log, { flags: 'a' })
+            : this.options.log
     } else {
       this.logStream = <NodeJS.WritableStream>this.options.log
     }
@@ -126,8 +127,8 @@ export class Webdriver {
           command,
           method,
           url,
-          postData: postData ? JSON.stringify(postData) : void 0,
-          data: JSON.stringify(data),
+          postData: postData,
+          data: data,
           time: (timeEnd - timeStart),
         })
       }
@@ -142,7 +143,7 @@ export class Webdriver {
           command,
           method,
           url,
-          postData: postData ? JSON.stringify(postData) : void 0,
+          postData: postData,
           data: err.message,
           time: (timeEnd - timeStart),
         })
@@ -157,10 +158,15 @@ function writeLog(out: NodeJS.WritableStream, data: WebdriverLog) {
 }
 
 function formatLog(data: WebdriverLog) {
+  const postData = !data.postData ? '' : '\n' + JSON.stringify(data.postData)
+  let responseData = data.status !== 'ERROR' ? Object.assign({}, data.data) : data.data
+  if (responseData.value && typeof responseData.value === 'string' && responseData.value.length > 128) {
+    responseData.value = responseData.value.substr(0, 128) + '...'
+  }
   return `[${data.status}] ${getDateTime(new Date(data.date))} ${data.time}ms\n${data.command}:
-REQUEST: ${data.method} ${data.url} ${!data.postData ? '' : '\n' + data.postData}
+REQUEST: ${data.method} ${data.url} ${postData}
 RESPONSE: ${data.statusCode}
-${data.data}\n\n`
+${JSON.stringify(responseData)}\n`
 }
 
 export interface WebdriverLog {
@@ -168,9 +174,9 @@ export interface WebdriverLog {
   command: string
   method: string
   url: string
-  postData: string
+  postData: any
   statusCode: string | number
-  data: string,
+  data: any,
   time: number,
   date: number
 }

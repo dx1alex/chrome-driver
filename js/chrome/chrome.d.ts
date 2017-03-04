@@ -1,4 +1,9 @@
-import { Browser, Capabilities, PauseSettings, Timeouts } from './browser';
+import { Browser, Capabilities, PauseSettings, Timeouts } from '../browser';
+import { ChromeExtension } from './extension';
+import { ChromeProxy } from './proxy';
+import { ChromeTabs } from './tabs';
+import { ChromeDump } from './dump';
+import { ChromeCapture } from './capture';
 export declare class Chrome extends Browser {
     protected static _no_proxy_list: string[];
     static default_prefs: object;
@@ -6,16 +11,14 @@ export declare class Chrome extends Browser {
     static default_extensions: string[];
     static default_args: string[];
     constructor(chromeOptions: ChromeOptions);
-    start(startOptions?: ChromeStartOptions): Promise<void>;
+    start(startOptions?: string | ChromeStartOptions): Promise<this>;
     setArgs(key: string, value?: string | boolean): number;
     setArgs(args: string[]): number;
     setArgs(args: {
         [key: string]: string | boolean;
     }): number;
-    clearProxy(): Promise<any>;
-    setProxy(proxy?: string): Promise<any>;
-    saveAsMHTML(filePath: string): Promise<{}>;
-    dump(dir?: string): Promise<string[]>;
+}
+export interface Chrome extends ChromeExtension, ChromeProxy, ChromeTabs, ChromeDump, ChromeCapture {
 }
 export interface ChromeOptions extends ChromeStartOptions {
     remote: string;
@@ -40,7 +43,7 @@ export interface ChromeStartOptions extends ChromeOptionsCapabilities {
     dataDir?: string;
     user?: string;
     profile?: string;
-    ifActiveSession?: 'exception' | 'restart' | 'continue';
+    onSessionExests?: 'exception' | 'restart' | 'continue';
     desiredCapabilities?: ChromeOptionsCapabilities;
 }
 export interface ChromeOptionsCapabilities extends Capabilities {

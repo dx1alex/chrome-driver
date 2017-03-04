@@ -27,10 +27,10 @@ export class Input extends Base {
     }
 
     if (selector) {
-      const id = await this._.elementId(selector)
+      const id = await this.elementId(selector)
       await this.webdriver.keysElement({ value, id })
-      await this._.sleep(pause || this.options.pause.keys)
-      if (submit) await this._.submit({ ELEMENT: id }, submitPause)
+      await this.sleep(pause || this.options.pause.keys)
+      if (submit) await this.submit({ ELEMENT: id }, submitPause)
       return
     }
 
@@ -38,30 +38,30 @@ export class Input extends Base {
   }
 
   async type(selector: Selector, ...keys: Array<number | boolean | string | Array<UnicodeKeys>>) {
-    const el = await this._.element(selector)
-    await this._.empty(el)
-    return this._.keys(el, ...keys)
+    const el = await this.element(selector)
+    await this.empty(el)
+    return this.keys(el, ...keys)
   }
 
   sendKeys(...keys: Array<string | Array<UnicodeKeys>>) {
-    return this._.keys(null, ...keys)
+    return this.keys(null, ...keys)
   }
 
   hotkeys(...keys: Array<string | Array<UnicodeKeys>>) {
-    return this._.keys(null, '\uE000', ...keys, '\uE000')
+    return this.keys(null, '\uE000', ...keys, '\uE000')
   }
 
   async clear(selector: Selector) {
-    return this.webdriver.clear({ id: await this._.elementId(selector) })
+    return this.webdriver.clear({ id: await this.elementId(selector) })
   }
 
   async empty(selector: Selector) {
-    const id = await this._.elementId(selector)
+    const id = await this.elementId(selector)
     try {
       await this.webdriver.clear({ id })
     } catch (err) {
       if (err.statusCode == 12) {
-        await this._.script({ ELEMENT: id }, (el: HTMLElement) => {
+        await this.script({ ELEMENT: id }, (el: HTMLElement) => {
           el.innerHTML = ''
         })
       } else {
@@ -71,39 +71,39 @@ export class Input extends Base {
   }
 
   async submit(selector: Selector, pause?: number) {
-    await this.webdriver.submit({ id: await this._.elementId(selector) })
-    await this._.sleep(pause || this.options.pause.submit)
+    await this.webdriver.submit({ id: await this.elementId(selector) })
+    await this.sleep(pause || this.options.pause.submit)
   }
 
   async check(checkbox: Selector, pause?: number) {
-    const id = await this._.elementId(checkbox)
+    const id = await this.elementId(checkbox)
     if (!(await this.webdriver.isElementSelected({ id }))) {
-      await this._.click({ ELEMENT: id }, pause)
+      await this.click({ ELEMENT: id }, pause)
       return true
     }
     return false
   }
 
   async uncheck(checkbox: Selector, pause?: number) {
-    const id = await this._.elementId(checkbox)
+    const id = await this.elementId(checkbox)
     if (await this.webdriver.isElementSelected({ id })) {
-      await this._.click({ ELEMENT: id }, pause)
+      await this.click({ ELEMENT: id }, pause)
       return true
     }
     return false
   }
 
   async uploadFile(input_file: Selector, filePath: string, pause?: number) {
-    await this.webdriver.keysElement({ id: await this._.elementId(input_file), value: [filePath] })
-    await this._.sleep(pause || this.options.pause.upload)
+    await this.webdriver.keysElement({ id: await this.elementId(input_file), value: [filePath] })
+    await this.sleep(pause || this.options.pause.upload)
   }
 
   select(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean) {
-    return this._.selectUnselect(true, select, option, submit, pause)
+    return this.selectUnselect(true, select, option, submit, pause)
   }
 
   unselect(select: Selector, option: object | number | string, submit?: boolean | number, pause?: number | boolean) {
-    return this._.selectUnselect(false, select, option, submit, pause)
+    return this.selectUnselect(false, select, option, submit, pause)
   }
 
   async selectUnselect(check: boolean, select: Selector, option: object | number | string, ...submitAndPause: (boolean | number)[]) {
@@ -122,26 +122,26 @@ export class Input extends Base {
 
     for (let option of options) {
       if (typeof option === 'number') {
-        const els = await this._.elements('option', select)
+        const els = await this.elements('option', select)
         el = els[option]
       } else if (typeof option === 'string') {
-        el = await this._.element(`option[value="${option}"]`, select)
+        el = await this.element(`option[value="${option}"]`, select)
       } else {
         let attrs = ''
         for (const [attr, value] of Object.entries(option)) {
           attrs += `[${attr}="${value}"]`
         }
-        el = await this._.element(`option${attrs}`, select)
+        el = await this.element(`option${attrs}`, select)
       }
 
       if (check) {
-        await this._.check(el, pause)
+        await this.check(el, pause)
       } else {
-        await this._.uncheck(el, pause)
+        await this.uncheck(el, pause)
       }
     }
 
-    if (submit) await this._.submit(el, submitPause)
+    if (submit) await this.submit(el, submitPause)
   }
 
   async form(form: Selector, inputs: any, ...submitAndPause: (boolean | number)[]) {
@@ -155,45 +155,45 @@ export class Input extends Base {
       }
     }
 
-    form = await this._.element(form)
+    form = await this.element(form)
 
     for (const [name, value] of Object.entries(inputs)) {
-      let els = await this._.elements(`[name="${name}"]`, form)
+      let els = await this.elements(`[name="${name}"]`, form)
       if (!els[0]) {
-        els = await this._.elements(`[id="${name}"]`, form)
+        els = await this.elements(`[id="${name}"]`, form)
       }
 
       const el = els[0]
-      const type = await this._.attr(el, 'type')
+      const type = await this.attr(el, 'type')
 
       if (['button', 'image', 'reset', 'submit'].includes(type)) {
-        if (value) await this._.click(el, pause)
+        if (value) await this.click(el, pause)
       } else if (type === 'radio') {
         for (let el of els) {
-          const val = await this._.attr(el, 'value')
+          const val = await this.attr(el, 'value')
           if (val == value) {
-            await this._.check(el, pause)
+            await this.check(el, pause)
             break
           }
         }
       } else if (type === 'checkbox') {
-        if (value) await this._.check(el, pause)
-        else await this._.uncheck(el, pause)
+        if (value) await this.check(el, pause)
+        else await this.uncheck(el, pause)
       } else if (type === 'file') {
-        await this._.uploadFile(el, value, pause)
+        await this.uploadFile(el, value, pause)
       } else if (type === 'hidden') {
-        await this._.script(el, (el: HTMLElement, val: string) => el.setAttribute('value', val), value)
+        await this.script(el, (el: HTMLElement, val: string) => el.setAttribute('value', val), value)
       } else {
-        const tag = await this._.tagName(el)
+        const tag = await this.tagName(el)
         if (tag === 'select') {
-          await this._.select(el, value, pause)
+          await this.select(el, value, pause)
         } else {
-          await this._.type(el, value, pause)
+          await this.type(el, value, pause)
         }
       }
     }
 
-    if (submit) await this._.submit(form, submitPause)
+    if (submit) await this.submit(form, submitPause)
   }
 
   //TODO

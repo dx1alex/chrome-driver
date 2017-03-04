@@ -26,7 +26,7 @@ export class Utils extends Base {
   }
 
   sleeps(sec: number, sec2 = 0) {
-    return this._.sleep(sec * 1000, sec2 * 1000)
+    return this.sleep(sec * 1000, sec2 * 1000)
   }
 
   waitUntil(fn: Function, settings: { timeout?: number, interval?: number, message?: string, nothrow?: boolean }): Promise<boolean | void>
@@ -74,12 +74,12 @@ export class Utils extends Base {
           || !Object.getOwnPropertyNames(State.prototype).includes(<string>state)) return void 0
 
         return async (...args: any[]) => {
-          const el = await this._.element(args[0])
+          const el = await this.element(args[0])
           const name = state.toString() + ' ' + (typeof args[0] === 'string' ? args[0] : args[0].value)
           const obj = {
             [name]: () => browser[state](el, ...(args.slice(1)))
           }
-          return this._.waitUntil(obj[name], <any>timeoutOrSettings, interval)
+          return this.waitUntil(obj[name], <any>timeoutOrSettings, interval)
         }
       }
     })

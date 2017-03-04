@@ -11,10 +11,10 @@ class Scroll extends base_1.Base {
         if (alignToTop === 'center') {
             alignToTop = true;
             const size = await this.webdriver.getElementSize({ id: await this.elementId(selector) });
-            const winSize = await this._.getViewSize();
+            const winSize = await this.getViewSize();
             offsetTop = offsetTop - (winSize.height / 2 + size.height / 2);
         }
-        await this._.script(selector, (el, align, offsetTop) => {
+        await this.script(selector, (el, align, offsetTop) => {
             el.scrollIntoView(align);
             if (offsetTop)
                 scrollBy(0, offsetTop);
@@ -25,7 +25,7 @@ class Scroll extends base_1.Base {
     }
     async scrollBy(selector, top, left) {
         if (typeof selector !== 'number') {
-            return this._.script(selector, (el, top, left) => {
+            return this.script(selector, (el, top, left) => {
                 if (top != null)
                     el.scrollTop += top;
                 if (left != null)
@@ -34,7 +34,7 @@ class Scroll extends base_1.Base {
         }
         left = top;
         top = selector;
-        return this._.execute((top = 0, left = 0) => scrollBy(left, top), top, left);
+        return this.execute((top = 0, left = 0) => scrollBy(left, top), top, left);
     }
     async scrollTo(selector, top, left) {
         if (typeof selector !== 'number') {
@@ -42,7 +42,7 @@ class Scroll extends base_1.Base {
                 top = Number.MAX_SAFE_INTEGER;
             if (left < 0)
                 left = Number.MAX_SAFE_INTEGER;
-            return this._.script(selector, (el, top, left) => {
+            return this.script(selector, (el, top, left) => {
                 if (top != null)
                     el.scrollTop = top;
                 if (left != null)
@@ -55,17 +55,17 @@ class Scroll extends base_1.Base {
             top = Number.MAX_SAFE_INTEGER;
         if (left < 0)
             left = Number.MAX_SAFE_INTEGER;
-        return this._.execute((top = 0, left = 0) => scrollTo(left, top), top, left);
+        return this.execute((top = 0, left = 0) => scrollTo(left, top), top, left);
     }
     scrollTop(selector, px) {
         if (px < 0)
             px = Number.MAX_SAFE_INTEGER;
-        return this._.script(selector, (el, px) => el.scrollTop = px, px);
+        return this.script(selector, (el, px) => el.scrollTop = px, px);
     }
     scrollLeft(selector, px) {
         if (px < 0)
             px = Number.MAX_SAFE_INTEGER;
-        return this._.script(selector, (el, px) => el.scrollLeft = px, px);
+        return this.script(selector, (el, px) => el.scrollLeft = px, px);
     }
 }
 exports.Scroll = Scroll;

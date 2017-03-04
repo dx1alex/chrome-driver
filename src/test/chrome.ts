@@ -1,12 +1,11 @@
-import { ChromeOptions, Chrome } from '../'
+import { ChromeOptions, Chrome } from '../chrome'
 
 let options: ChromeOptions = {
   remote: 'http://localhost:9500',
   window: [0, 0, 1200, 800],
-  log: true,
-  //verbose: true,
+  log: 'console.info',
   dataDir: '/tmp/test0',
-  ifActiveSession: 'restart'
+  onSessionExests: 'restart',
 }
 
 const bro = new Chrome(options)
@@ -14,20 +13,11 @@ const bro = new Chrome(options)
 main()
 async function main() {
   try {
-    console.log(await bro.getStatus())
+    await bro.start('https://vk.com/about')
+    await bro.screenshot('/tmp/4.png')
 
-    await bro.start()
-    console.log(bro.capabilities)
-
-    await bro.go('http://ya.ru')
-    const tab = await bro.getTab()
-    await bro.newTab(true)
-    await bro.go('http://vk.com')
-    await bro.switchTab(tab, true)
-    await bro.go('http://yandex.ru')
-
-
-    console.log(bro.lastCommand())
+    await bro.sleep(1000)
+    console.log(JSON.stringify(bro.lastCommand()))
   } catch (err) {
     console.error(bro.lastError(err))
   }

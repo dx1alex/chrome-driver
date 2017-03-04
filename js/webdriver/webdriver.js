@@ -12,9 +12,10 @@ class Webdriver {
         this.options = typeof options === 'string' ? { remote: options } : Object.assign({}, options);
         this.options.remote = this.options.remote.replace(/\/+$/, '');
         if (this.options.log && typeof this.options.log !== 'object') {
-            this.logStream = typeof this.options.log === 'boolean'
-                ? process.stdout
-                : fs.createWriteStream(this.options.log, { flags: 'a' });
+            this.logStream = typeof this.options.log === 'boolean' ? process.stdout
+                : /^console/.test(this.options.log) ? { write: console[this.options.log.split('.')[1] || 'log'] }
+                    : typeof this.options.log === 'string' ? fs.createWriteStream(this.options.log, { flags: 'a' })
+                        : this.options.log;
         }
         else {
             this.logStream = this.options.log;
@@ -108,8 +109,8 @@ class Webdriver {
                     command,
                     method,
                     url,
-                    postData: postData ? JSON.stringify(postData) : void 0,
-                    data: JSON.stringify(data),
+                    postData: postData,
+                    data: data,
                     time: (timeEnd - timeStart),
                 });
             }
@@ -125,7 +126,7 @@ class Webdriver {
                     command,
                     method,
                     url,
-                    postData: postData ? JSON.stringify(postData) : void 0,
+                    postData: postData,
                     data: err.message,
                     time: (timeEnd - timeStart),
                 });
@@ -139,8 +140,13 @@ function writeLog(out, data) {
     return out.write(formatLog(data));
 }
 function formatLog(data) {
+    const postData = !data.postData ? '' : '\n' + JSON.stringify(data.postData);
+    let responseData = data.status !== 'ERROR' ? Object.assign({}, data.data) : data.data;
+    if (responseData.value && typeof responseData.value === 'string' && responseData.value.length > 128) {
+        responseData.value = responseData.value.substr(0, 128) + '...';
+    }
     return `[${data.status}] ${helpers_1.getDateTime(new Date(data.date))} ${data.time}ms\n${data.command}:
-REQUEST: ${data.method} ${data.url} ${!data.postData ? '' : '\n' + data.postData}
+REQUEST: ${data.method} ${data.url} ${postData}
 RESPONSE: ${data.statusCode}
-${data.data}\n\n`;
+${JSON.stringify(responseData)}\n`;
 }

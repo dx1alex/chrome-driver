@@ -19,7 +19,7 @@ export class $Class extends Base {
       get: (browser, command, r) => {
         if (typeof browser[command] === 'function' && $Class._$List.includes(<string>command)) {
           return async (...args: any[]) => {
-            if (typeof selector === 'string') selector = await this._.element(selector)
+            if (typeof selector === 'string') selector = await this.element(selector)
             return browser[command](selector, ...args)
           }
         }

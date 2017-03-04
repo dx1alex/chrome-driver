@@ -20,9 +20,9 @@ export interface WebdriverLog {
     command: string;
     method: string;
     url: string;
-    postData: string;
+    postData: any;
     statusCode: string | number;
-    data: string;
+    data: any;
     time: number;
     date: number;
 }

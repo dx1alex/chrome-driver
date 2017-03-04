@@ -19,11 +19,11 @@ export class Alert extends Base {
   }
 
   async alert(accept: boolean, text?: string) {
-    if (text) await this._.setAlert(text)
+    if (text) await this.setAlert(text)
     if (accept) {
-      await this._.okAlert()
+      await this.okAlert()
     } else {
-      await this._.cancelAlert()
+      await this.cancelAlert()
     }
   }
 

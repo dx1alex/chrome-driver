@@ -4,16 +4,21 @@ import {
   PauseSettings,
   Timeouts,
   Proxy
-} from './browser'
-
-import { getDateTime } from './helpers'
+} from '../browser'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import * as URL from 'url'
 
-const extensionsDir = path.resolve(__dirname, '../extensions')
-const driverExtension = fs.readFileSync(`${extensionsDir}/driver.crx`, 'base64')
+import { getDateTime, applyMixins } from '../helpers'
+
+import { ChromeExtension } from './extension'
+import { ChromeProxy } from './proxy'
+import { ChromeTabs } from './tabs'
+import { ChromeDump } from './dump'
+import { ChromeCapture } from './capture'
+
+const extensionsDir = path.resolve(__dirname, '../../extensions')
+//const driverExtension: string = fs.readFileSync(`${extensionsDir}/driver.crx`, 'base64')
 
 export class Chrome extends Browser {
   protected static _no_proxy_list: string[] = Browser._no_proxy_list.concat('setArgs')
@@ -28,9 +33,9 @@ export class Chrome extends Browser {
     script: 1000,
     'page load': 30000
   }
-  static default_extensions: string[] = [driverExtension]
+  static default_extensions: string[] = []//[driverExtension]
   static default_args = [
-    //`load-extension=${extensionsDir}/driver`,
+    `load-extension=${extensionsDir}/driver`,
     'disable-background-networking',
     'disable-client-side-phishing-detection',
     'disable-component-update',
@@ -90,7 +95,10 @@ export class Chrome extends Browser {
     super(options)
   }
 
-  async start(startOptions?: ChromeStartOptions) {
+  async start(startOptions?: string | ChromeStartOptions) {
+    if (typeof startOptions === 'string')
+      startOptions = { url: startOptions }
+
     const options: ChromeStartOptions = JSON.parse(JSON.stringify(Object.assign({}, this.options, startOptions)))
     const chromeOptions = options.desiredCapabilities.chromeOptions
 
@@ -100,7 +108,7 @@ export class Chrome extends Browser {
       const sessions = await this.webdriver.getSessions()
       for (const v of sessions) {
         if (v.capabilities.chrome.userDataDir === userDataDir) {
-          switch (options.ifActiveSession) {
+          switch (options.onSessionExests) {
             case 'continue':
               try {
                 await this.webdriver.getCurrentURL({ sessionId: v.id })
@@ -148,36 +156,36 @@ export class Chrome extends Browser {
     this.started = true
 
     const timeouts = Object.assign({}, Chrome.default_timeouts, options.timeouts)
-    await this._.setTimeouts(timeouts)
+    await this.setTimeouts(timeouts)
 
     await this.webdriver.go({ url: 'chrome://newtab' })
 
     if (options.proxy) {
-      await this._.setProxy(options.proxy)
+      await this.setProxy(options.proxy)
     }
 
     if (options.maximaze) {
-      await this._.maximize()
+      await this.maximize()
     } else if (options.fullscreen) {
-      //TODO 
-      //await this._.fullscreen()
+      await this.fullscreen()
     } else {
       if (options.window) {
         options.windowPosition = [options.window[0], options.window[1]]
         options.windowSize = [options.window[2], options.window[3]]
       }
       if (options.windowPosition) {
-        await this._.setPosition(options.windowPosition[0], options.windowPosition[1])
+        await this.setPosition(options.windowPosition[0], options.windowPosition[1])
       }
       if (options.windowSize) {
-        await this._.setSize(options.windowSize[0], options.windowSize[1])
+        await this.setSize(options.windowSize[0], options.windowSize[1])
       }
     }
 
     if (options.url) {
-      await this._.go(options.url)
+      await this.go(options.url)
     }
 
+    return this
   }
 
   setArgs(key: string, value?: string | boolean): number
@@ -197,116 +205,15 @@ export class Chrome extends Browser {
     return 0
   }
 
-  clearProxy() {
-    return this._.extension(() => {
-      chrome.proxy.settings.clear({})
-      proxy_auth = null
-    })
-  }
-
-  setProxy(proxy?: string) {
-    if (!proxy) {
-      return this._.clearProxy()
-    }
-
-    if (!(/^https?:\/\//.test(proxy) || /^socks[4|5]:\/\//.test(proxy))) proxy = 'http://' + proxy
-
-    const { protocol, hostname, port, auth } = URL.parse(proxy),
-      scheme = protocol.slice(0, -1)
-
-    let pauth
-    if (auth) {
-      const p = auth.split(':')
-      pauth = {
-        login: p[0],
-        password: p[1]
-      }
-    }
-
-    return this._.extension((scheme: string, host: string, port: number, auth?: { login: string, password: string }) => {
-      console.log(scheme, host, port, auth)
-      chrome.proxy.settings.set({
-        value: {
-          mode: "fixed_servers",
-          rules: {
-            singleProxy: {
-              scheme, host, port
-            }
-          }
-        },
-        scope: 'regular'
-      })
-      proxy_auth = auth
-    }, scheme, hostname, +port, pauth)
-  }
-
-  async saveAsMHTML(filePath: string) {
-    const mhtml = await this._.extension(() => {
-      return new Promise((resolve, reject) => {
-        chrome.tabs.query({ active: true }, tabs => {
-          chrome.pageCapture.saveAsMHTML({ tabId: tabs[0].id }, mhtml => {
-            const reader = new FileReader()
-            reader.readAsDataURL(mhtml)
-            reader.onloadend = () => {
-              resolve(reader.result)
-            }
-          })
-        })
-      })
-    })
-
-    const base64Data = mhtml.substr('data:;base64,'.length)
-
-    return new Promise((resolve, reject) => {
-      fs.writeFile(<string>filePath, base64Data, 'base64', err => {
-        if (err) return reject(err)
-        resolve()
-      })
-    })
-  }
-
-  async dump(dir?: string) {
-    if (!dir) {
-      dir = this.capabilities.chrome.userDataDir
-    }
-
-    const dumpDir = getDateTime().replace(' ', '_')
-    dir = `${dir}/${dumpDir}`
-    fs.mkdirSync(dir)
-
-    const commandHistory = JSON.stringify(this.commandHistory, null, '  ')
-    const history = new Promise((resolve, reject) => {
-      fs.writeFile(`${dir}/command_history.json`, commandHistory, err => {
-        if (err) return reject(err)
-        resolve()
-      })
-    })
-
-    const lastError = JSON.stringify(this._lastError, null, '  ')
-    const error = new Promise((resolve, reject) => {
-      fs.writeFile(`${dir}/last_error.json`, lastError, err => {
-        if (err) return reject(err)
-        resolve()
-      })
-    })
-
-    const html_page = await this._.html()
-    const html = new Promise((resolve, reject) => {
-      fs.writeFile(`${dir}/page.html`, html_page, err => {
-        if (err) return reject(err)
-        resolve()
-      })
-    })
-
-    const mhtml = this._.saveAsMHTML(`${dir}/page.mht`)
-
-    const screenshot = this._.screenshot(`${dir}/screenshot.png`)
-
-    return Promise.all([history, error, html, mhtml, screenshot])
-  }
 }
 
-declare var proxy_auth: { login: string, password: string }
+applyMixins(Chrome, [
+  ChromeExtension, ChromeProxy, ChromeTabs, ChromeDump, ChromeCapture
+])
+
+export interface Chrome extends
+  ChromeExtension, ChromeProxy, ChromeTabs, ChromeDump, ChromeCapture {
+}
 
 function setArgs(args: Array<string>, key: string, value?: string | boolean) {
   let i = args.findIndex(v => v.split('=')[0] === key)
@@ -352,7 +259,7 @@ export interface ChromeStartOptions extends ChromeOptionsCapabilities {
   dataDir?: string
   user?: string
   profile?: string
-  ifActiveSession?: 'exception' | 'restart' | 'continue'
+  onSessionExests?: 'exception' | 'restart' | 'continue'
   desiredCapabilities?: ChromeOptionsCapabilities
 }
 

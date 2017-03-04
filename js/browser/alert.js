@@ -16,12 +16,12 @@ class Alert extends base_1.Base {
     }
     async alert(accept, text) {
         if (text)
-            await this._.setAlert(text);
+            await this.setAlert(text);
         if (accept) {
-            await this._.okAlert();
+            await this.okAlert();
         }
         else {
-            await this._.cancelAlert();
+            await this.cancelAlert();
         }
     }
 }

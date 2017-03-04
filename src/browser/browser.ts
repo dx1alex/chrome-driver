@@ -45,18 +45,8 @@ export class Browser extends Base {
   protected static _no_proxy_list: string[] = [$Class, CommandHistory]
     .map(n => Object.getOwnPropertyNames(n.prototype).filter(v => v !== 'constructor'))
     .reduce((a, b) => a.concat(b))
+    .concat(Object.getOwnPropertyNames(Object.prototype))
     .concat(['elementId'])
-
-  protected static DEFAULT_WAIT_TIMEOUT = 30000
-  protected static DEFAULT_WAIT_INTERVAL = 1000
-  protected static MAX_COMMAND_HISTORY_ITEMS = 100
-
-  static readonly KEY = UNICODE_KEYS
-
-  private _numCommand = 0
-
-  commandHistory: CommandHistoryObject[] = []
-  logStream: NodeJS.WritableStream
 
   constructor(options: BrowserOptions) {
     super()
@@ -78,7 +68,9 @@ export class Browser extends Base {
     if (this.options.log) {
       this.logStream = typeof this.options.log === 'boolean'
         ? process.stdout
-        : fs.createWriteStream(this.options.log, { flags: 'a' })
+        : /^console/.test(this.options.log)
+          ? <any>{ write: console[this.options.log.split('.')[1] || 'log'] }
+          : fs.createWriteStream(this.options.log, { flags: 'a' })
     }
 
     this.webdriver = new Webdriver({
@@ -110,7 +102,7 @@ export class Browser extends Base {
           }
 
           if (this.logStream) {
-            this.logStream.write(`[${++this._numCommand}] ${getDateTime(date)} \n${command} ${strArgs} \n${stack}\n\n`)
+            this.logStream.write(`[${++this._numCommand}] ${getDateTime(date)} \n${command} ${strArgs} \n${stack}\n`)
           }
 
           const timeStart = Date.now()
@@ -121,7 +113,7 @@ export class Browser extends Base {
               (res: any) => {
                 const timeEnd = Date.now()
                 lastCommand.time = timeEnd - timeStart
-                lastCommand.result = res
+                lastCommand.result = res === this ? 'this' : res
                 this._lastCommand = lastCommand
                 return res
               },
@@ -135,7 +127,7 @@ export class Browser extends Base {
           } else {
             const timeEnd = Date.now()
             lastCommand.time = timeEnd - timeStart
-            lastCommand.result = res
+            lastCommand.result = res === this ? 'this' : res
             this._lastCommand = lastCommand
           }
 
@@ -143,10 +135,6 @@ export class Browser extends Base {
         }
       }
     })
-  }
-
-  protected get _(): this {
-    return this.options.verbose ? this._this_proxy : this
   }
 
   getStatus() {
@@ -176,27 +164,29 @@ export class Browser extends Base {
     this.started = true
 
     if (init.timeouts) {
-      await this._.setTimeouts(init.timeouts)
+      await this.setTimeouts(init.timeouts)
     }
 
     if (init.maximaze) {
-      await this._.maximize()
+      await this.maximize()
     } else {
       if (init.window) {
         init.windowPosition = [init.window[0], init.window[1]]
         init.windowSize = [init.window[2], init.window[3]]
       }
       if (init.windowPosition) {
-        await this._.setPosition(init.windowPosition[0], init.windowPosition[1])
+        await this.setPosition(init.windowPosition[0], init.windowPosition[1])
       }
       if (init.windowSize) {
-        await this._.setSize(init.windowSize[0], init.windowSize[1])
+        await this.setSize(init.windowSize[0], init.windowSize[1])
       }
     }
 
     if (init.url) {
-      await this._.go(init.url)
+      await this.go(init.url)
     }
+
+    return this
   }
 
 }

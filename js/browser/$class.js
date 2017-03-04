@@ -8,7 +8,7 @@ class $Class extends base_1.Base {
                 if (typeof browser[command] === 'function' && $Class._$List.includes(command)) {
                     return async (...args) => {
                         if (typeof selector === 'string')
-                            selector = await this._.element(selector);
+                            selector = await this.element(selector);
                         return browser[command](selector, ...args);
                     };
                 }

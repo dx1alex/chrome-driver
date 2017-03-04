@@ -18,7 +18,7 @@ class Tabs extends base_1.Base {
         return this.webdriver.getWindowSize({ windowHandle });
     }
     getViewSize() {
-        return this._.execute(() => {
+        return this.execute(() => {
             return {
                 width: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
                 height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
@@ -37,21 +37,21 @@ class Tabs extends base_1.Base {
             await this.webdriver.screenshot();
     }
     async closeTab(name) {
-        const tab = await this._.getTab();
+        const tab = await this.getTab();
         if (name !== tab) {
-            await this._.switchTab(name);
+            await this.switchTab(name);
             await this.webdriver.closeWindow();
-            await this._.switchTab(tab);
+            await this.switchTab(tab);
         }
         else {
-            const tabs = await this._.getTabs();
+            const tabs = await this.getTabs();
             let newtab = null;
             if (tabs.length > 1) {
                 newtab = tabs[tabs.indexOf(tab) + (tabs[0] != tab ? -1 : 1)];
             }
             await this.webdriver.closeWindow();
             if (newtab != null)
-                await this._.switchTab(newtab);
+                await this.switchTab(newtab);
         }
     }
     async newTab(url, switchTo = false) {
@@ -59,16 +59,16 @@ class Tabs extends base_1.Base {
             switchTo = url;
             url = undefined;
         }
-        await this._.execute((url) => {
+        await this.execute((url) => {
             const a = document.createElement('a');
             a.href = url;
             a.target = '_blank';
             a.click();
         }, url || '');
-        const tabs = await this._.getTabs();
+        const tabs = await this.getTabs();
         const newtab = tabs[tabs.length - 1];
         if (switchTo)
-            await this._.switchTab(newtab);
+            await this.switchTab(newtab);
         return newtab;
     }
     onTop() {

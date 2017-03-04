@@ -3,7 +3,6 @@ import { Elements } from './elements';
 export interface Exec extends Elements {
 }
 export declare class Exec extends Base {
-    extension(code: string | Function, ...args: any[]): Promise<any>;
     execute(code: string | Function, ...args: any[]): Promise<any>;
     executeAsync(code: string | Function, ...args: any[]): Promise<any>;
     script(selector: Selector | Selector[], code: string | Function, ...args: any[]): Promise<any>;

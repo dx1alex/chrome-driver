@@ -4,7 +4,7 @@ const base_1 = require("./base");
 class Elements extends base_1.Base {
     async getElement(selector, parent) {
         try {
-            return this._.element(selector, parent);
+            return this.element(selector, parent);
         }
         catch (err) {
             if (err.state && err.state == 7)
@@ -56,7 +56,7 @@ class Elements extends base_1.Base {
     async elementId(selector, parent) {
         if (typeof selector !== 'string')
             return selector.ELEMENT;
-        return (await this._.element(selector, parent)).ELEMENT;
+        return (await this.element(selector, parent)).ELEMENT;
     }
 }
 exports.Elements = Elements;

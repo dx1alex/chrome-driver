@@ -7,6 +7,8 @@ import {
   LocatorStrategy
 } from '../webdriver'
 
+import { UNICODE_KEYS } from '../helpers'
+import { CommandHistoryObject } from './command-history'
 
 export abstract class Base {
   options: BrowserOptions
@@ -14,10 +16,22 @@ export abstract class Base {
   capabilities: Capabilities
   sessionId = ''
   started = false
+
   protected _this_proxy = this
-  protected get _() {
-    return this
-  }
+
+  protected static _no_command_history_list: string[] = []
+  protected static _no_proxy_list: string[] = []
+
+  protected static DEFAULT_WAIT_TIMEOUT = 30000
+  protected static DEFAULT_WAIT_INTERVAL = 1000
+  protected static MAX_COMMAND_HISTORY_ITEMS = 100
+
+  static readonly KEY = UNICODE_KEYS
+
+  protected _numCommand = 0
+
+  commandHistory: CommandHistoryObject[] = []
+  logStream: NodeJS.WritableStream
 }
 
 export interface PauseSettings {
@@ -41,8 +55,6 @@ export type Selector = string | WebElement
 export interface BrowserOptions extends BrowserStartOptions {
   remote: string
   log?: string | boolean
-  verbose?: boolean
-
   waitTimeout?: number
   waitInterval?: number
   pause?: PauseSettings

@@ -12,7 +12,7 @@ export interface Screenshot extends Scroll, Getter, Elements, Exec {
 export class Screenshot extends Base {
 
   async getImage(image: Selector, filePath?: string) {
-    const png = await this._.scriptAsync(image, (el: HTMLImageElement, done: any) => {
+    const png = await this.scriptAsync(image, (el: HTMLImageElement, done: any) => {
       const url = el.getAttribute('src')
       const img = new Image()
       img.setAttribute('crossOrigin', 'anonymous')
@@ -38,10 +38,10 @@ export class Screenshot extends Base {
     let base64Data = png.substr(22)
 
     if (filePath) {
-      await new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         fs.writeFile(filePath, base64Data, 'base64', (err) => {
           if (err) return reject(err)
-          resolve()
+          resolve(base64Data)
         })
       })
     }
@@ -57,24 +57,25 @@ export class Screenshot extends Base {
     }
 
     if (fullPage) {
-      const body = await this._.element('body'),
-        { height } = await this._.getViewSize(),
+      const body = await this.element('body'),
+        { height } = await this.getViewSize(),
         screens = []
       let scroll = -1
       while (true) {
-        await this._.scrollTo(scroll)
-        let scrollTop: number = await this._.prop(body, 'scrollTop')
+        await this.scrollTo(scroll)
+        let scrollTop: number = await this.prop(body, 'scrollTop')
         scrollTop |= 0
         screens.push({
           scrollTop,
-          img: await this._.screenshot()
+          img: await this.captureTab()
         })
         if (scrollTop <= 0) break
         scroll = scrollTop - height
         if (scroll < 0) scroll = 0
       }
 
-      const png = await this._.execute((screens: any[]) => {
+      const png = await this.execute((screens: any[]) => {
+        console.log('screenshot')
         const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
         const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 
@@ -92,21 +93,23 @@ export class Screenshot extends Base {
           ctx.drawImage(img, 0, screen.scrollTop)
         }
 
-        return canvas.toDataURL()
+        const png = canvas.toDataURL()
+        console.log(png.length)
+        return png
 
-      }, screens)
+      }, screens.slice(0, 2))
 
-      base64Data = png.substr(22)
+      base64Data = png.substr('data:image/png;base64,'.length)
 
     } else {
-      base64Data = await this.webdriver.screenshot()
+      base64Data = await this.captureTab()
     }
 
     if (filePath) {
-      await new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         fs.writeFile(<string>filePath, base64Data, 'base64', err => {
           if (err) return reject(err)
-          resolve()
+          resolve(base64Data)
         })
       })
     }
@@ -124,17 +127,17 @@ export class Screenshot extends Base {
     const off = Object.assign({ x: 0, y: 0, w: 0, h: 0 }, offset)
 
     if (selector) {
-      let loc = await this._.locationInView(selector)
-      let size = await this._.size(selector)
+      let loc = await this.locationInView(selector)
+      let size = await this.size(selector)
       off.x += loc.x
       off.y += loc.y
       off.w += size.width
       off.h += size.height
     }
 
-    const screen = await this._.screenshot()
+    const screen = await this.captureTab()
 
-    const png = await this._.execute((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
+    const png = await this.execute((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
       const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
       const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 
@@ -153,18 +156,26 @@ export class Screenshot extends Base {
 
     }, screen, off)
 
-    const base64Data = png.substr(22)
+    const base64Data = png.substr('data:image/png;base64,'.length)
 
     if (filePath) {
-      await new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         fs.writeFile(<string>filePath, base64Data, 'base64', err => {
           if (err) return reject(err)
-          resolve()
+          resolve(base64Data)
         })
       })
     }
 
     return base64Data
+  }
+
+  captureTab() {
+    return this.webdriver.screenshot()
+  }
+
+  getScreenshot() {
+    return this.webdriver.screenshot()
   }
 
 }

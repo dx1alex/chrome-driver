@@ -19,7 +19,7 @@ class Utils extends base_1.Base {
         return Promise.resolve();
     }
     sleeps(sec, sec2 = 0) {
-        return this._.sleep(sec * 1000, sec2 * 1000);
+        return this.sleep(sec * 1000, sec2 * 1000);
     }
     waitUntil(fn, timeoutOrSettings, interval) {
         let message = `waitUntil (${fn.name}) exit by timeout`, timeout = 0, nothrow = false;
@@ -61,12 +61,12 @@ class Utils extends base_1.Base {
                     || !Object.getOwnPropertyNames(state_1.State.prototype).includes(state))
                     return void 0;
                 return async (...args) => {
-                    const el = await this._.element(args[0]);
+                    const el = await this.element(args[0]);
                     const name = state.toString() + ' ' + (typeof args[0] === 'string' ? args[0] : args[0].value);
                     const obj = {
                         [name]: () => browser[state](el, ...(args.slice(1)))
                     };
-                    return this._.waitUntil(obj[name], timeoutOrSettings, interval);
+                    return this.waitUntil(obj[name], timeoutOrSettings, interval);
                 };
             }
         });

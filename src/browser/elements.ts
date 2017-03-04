@@ -6,7 +6,7 @@ export class Elements extends Base {
   getElement(selector: Selector, parent?: Selector): Promise<WebElement | null>
   async getElement(selector?: Selector, parent?: Selector): Promise<WebElement | null> {
     try {
-      return this._.element(selector, parent)
+      return this.element(selector, parent)
     } catch (err) {
       if (err.state && err.state == 7) return Promise.resolve(null)
       throw err
@@ -63,6 +63,6 @@ export class Elements extends Base {
 
   async elementId(selector: Selector, parent?: Selector) {
     if (typeof selector !== 'string') return selector.ELEMENT
-    return (await this._.element(selector, parent)).ELEMENT
+    return (await this.element(selector, parent)).ELEMENT
   }
 }

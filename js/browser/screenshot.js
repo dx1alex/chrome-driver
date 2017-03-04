@@ -4,7 +4,7 @@ const fs = require("fs");
 const base_1 = require("./base");
 class Screenshot extends base_1.Base {
     async getImage(image, filePath) {
-        const png = await this._.scriptAsync(image, (el, done) => {
+        const png = await this.scriptAsync(image, (el, done) => {
             const url = el.getAttribute('src');
             const img = new Image();
             img.setAttribute('crossOrigin', 'anonymous');
@@ -27,11 +27,11 @@ class Screenshot extends base_1.Base {
         });
         let base64Data = png.substr(22);
         if (filePath) {
-            await new Promise((resolve, reject) => {
+            return await new Promise((resolve, reject) => {
                 fs.writeFile(filePath, base64Data, 'base64', (err) => {
                     if (err)
                         return reject(err);
-                    resolve();
+                    resolve(base64Data);
                 });
             });
         }
@@ -44,15 +44,15 @@ class Screenshot extends base_1.Base {
             filePath = void 0;
         }
         if (fullPage) {
-            const body = await this._.element('body'), { height } = await this._.getViewSize(), screens = [];
+            const body = await this.element('body'), { height } = await this.getViewSize(), screens = [];
             let scroll = -1;
             while (true) {
-                await this._.scrollTo(scroll);
-                let scrollTop = await this._.prop(body, 'scrollTop');
+                await this.scrollTo(scroll);
+                let scrollTop = await this.prop(body, 'scrollTop');
                 scrollTop |= 0;
                 screens.push({
                     scrollTop,
-                    img: await this._.screenshot()
+                    img: await this.captureTab()
                 });
                 if (scrollTop <= 0)
                     break;
@@ -60,7 +60,8 @@ class Screenshot extends base_1.Base {
                 if (scroll < 0)
                     scroll = 0;
             }
-            const png = await this._.execute((screens) => {
+            const png = await this.execute((screens) => {
+                console.log('screenshot');
                 const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
                 const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
                 const canvas = document.createElement('canvas');
@@ -73,19 +74,21 @@ class Screenshot extends base_1.Base {
                     img.src = 'data:image/png;base64,' + screen.img;
                     ctx.drawImage(img, 0, screen.scrollTop);
                 }
-                return canvas.toDataURL();
-            }, screens);
-            base64Data = png.substr(22);
+                const png = canvas.toDataURL();
+                console.log(png.length);
+                return png;
+            }, screens.slice(0, 2));
+            base64Data = png.substr('data:image/png;base64,'.length);
         }
         else {
-            base64Data = await this.webdriver.screenshot();
+            base64Data = await this.captureTab();
         }
         if (filePath) {
-            await new Promise((resolve, reject) => {
+            return await new Promise((resolve, reject) => {
                 fs.writeFile(filePath, base64Data, 'base64', err => {
                     if (err)
                         return reject(err);
-                    resolve();
+                    resolve(base64Data);
                 });
             });
         }
@@ -99,15 +102,15 @@ class Screenshot extends base_1.Base {
         }
         const off = Object.assign({ x: 0, y: 0, w: 0, h: 0 }, offset);
         if (selector) {
-            let loc = await this._.locationInView(selector);
-            let size = await this._.size(selector);
+            let loc = await this.locationInView(selector);
+            let size = await this.size(selector);
             off.x += loc.x;
             off.y += loc.y;
             off.w += size.width;
             off.h += size.height;
         }
-        const screen = await this._.screenshot();
-        const png = await this._.execute((screen, offset) => {
+        const screen = await this.captureTab();
+        const png = await this.execute((screen, offset) => {
             const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
             const canvas = document.createElement('canvas');
@@ -120,17 +123,23 @@ class Screenshot extends base_1.Base {
             ctx.drawImage(img, offset.x, offset.y, offset.w, offset.h, 0, 0, offset.w, offset.h);
             return canvas.toDataURL();
         }, screen, off);
-        const base64Data = png.substr(22);
+        const base64Data = png.substr('data:image/png;base64,'.length);
         if (filePath) {
-            await new Promise((resolve, reject) => {
+            return await new Promise((resolve, reject) => {
                 fs.writeFile(filePath, base64Data, 'base64', err => {
                     if (err)
                         return reject(err);
-                    resolve();
+                    resolve(base64Data);
                 });
             });
         }
         return base64Data;
+    }
+    captureTab() {
+        return this.webdriver.screenshot();
+    }
+    getScreenshot() {
+        return this.webdriver.screenshot();
     }
 }
 exports.Screenshot = Screenshot;
