@@ -31,8 +31,8 @@ export class Chrome extends Browser {
     }
   }
   static default_timeouts: Timeouts = {
-    implicit: 100,
-    script: 1000,
+    implicit: 500,
+    script: 2000,
     'page load': 30000
   }
   static default_extensions: string[] = []//[driverExtension]

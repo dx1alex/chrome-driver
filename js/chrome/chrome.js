@@ -141,8 +141,8 @@ Chrome.default_prefs = {
     }
 };
 Chrome.default_timeouts = {
-    implicit: 100,
-    script: 1000,
+    implicit: 500,
+    script: 2000,
     'page load': 30000
 };
 Chrome.default_extensions = []; //[driverExtension]
