@@ -25,9 +25,9 @@ class Screenshot extends base_1.Base {
                 done(dataURL);
             }
         });
-        let base64Data = png.substr(22);
+        let base64Data = png.substr('data:image/png;base64,'.length);
         if (filePath) {
-            return await new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 fs.writeFile(filePath, base64Data, 'base64', (err) => {
                     if (err)
                         return reject(err);

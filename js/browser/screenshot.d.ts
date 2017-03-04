@@ -6,8 +6,8 @@ import { Scroll } from './scroll';
 export interface Screenshot extends Scroll, Getter, Elements, Exec {
 }
 export declare class Screenshot extends Base {
-    getImage(image: Selector, filePath?: string): Promise<any>;
-    screenshot(filePath?: string | boolean, fullPage?: boolean): Promise<{}>;
+    getImage(image: Selector, filePath?: string): Promise<string>;
+    screenshot(filePath?: string | boolean, fullPage?: boolean): Promise<string>;
     capture(selector: Selector, filePath?: string | {
         x?: number;
         y?: number;
@@ -18,7 +18,7 @@ export declare class Screenshot extends Base {
         y?: number;
         w?: number;
         h?: number;
-    }): Promise<any>;
+    }): Promise<string>;
     captureTab(): Promise<string>;
     getScreenshot(): Promise<string>;
 }

@@ -43,7 +43,7 @@ class ChromeDump extends base_1.Base {
             fs.writeFile(`${dir}/page.html`, html_page, err => {
                 if (err)
                     return reject(err);
-                resolve();
+                resolve(html_page);
             });
         });
         const mhtml = this.saveAsMHTML(`${dir}/page.mht`);

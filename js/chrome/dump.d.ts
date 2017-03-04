@@ -6,6 +6,6 @@ import { Screenshot } from '../browser/screenshot';
 export interface ChromeDump extends ChromeExtension, CommandHistory, Getter, Screenshot {
 }
 export declare class ChromeDump extends Base {
-    saveAsMHTML(filePath: string): Promise<{}>;
-    dump(dir?: string): Promise<{}[]>;
+    saveAsMHTML(filePath: string): Promise<string>;
+    dump(dir?: string): Promise<[void, void, string, string, string]>;
 }

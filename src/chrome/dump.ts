@@ -13,11 +13,11 @@ export interface ChromeDump extends ChromeExtension, CommandHistory, Getter, Scr
 export class ChromeDump extends Base {
 
   async saveAsMHTML(filePath: string) {
-    const mhtml = await this.extension(() => saveAsMHTML())
+    const mhtml: string = await this.extension(() => saveAsMHTML())
 
     const base64Data = mhtml.substr('data:;base64,'.length)
 
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       fs.writeFile(<string>filePath, base64Data, 'base64', err => {
         if (err) return reject(err)
         resolve()
@@ -35,7 +35,7 @@ export class ChromeDump extends Base {
     fs.mkdirSync(dir)
 
     const commandHistory = JSON.stringify(this.commandHistory, null, '  ')
-    const history = new Promise((resolve, reject) => {
+    const history = new Promise<void>((resolve, reject) => {
       fs.writeFile(`${dir}/command_history.json`, commandHistory, err => {
         if (err) return reject(err)
         resolve()
@@ -43,7 +43,7 @@ export class ChromeDump extends Base {
     })
 
     const lastError = JSON.stringify(this.lastError(), null, '  ')
-    const error = new Promise((resolve, reject) => {
+    const error = new Promise<void>((resolve, reject) => {
       fs.writeFile(`${dir}/last_error.json`, lastError, err => {
         if (err) return reject(err)
         resolve()
@@ -51,10 +51,10 @@ export class ChromeDump extends Base {
     })
 
     const html_page = await this.html()
-    const html = new Promise((resolve, reject) => {
+    const html = new Promise<string>((resolve, reject) => {
       fs.writeFile(`${dir}/page.html`, html_page, err => {
         if (err) return reject(err)
-        resolve()
+        resolve(html_page)
       })
     })
 

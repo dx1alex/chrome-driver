@@ -12,7 +12,7 @@ export interface Screenshot extends Scroll, Getter, Elements, Exec {
 export class Screenshot extends Base {
 
   async getImage(image: Selector, filePath?: string) {
-    const png = await this.scriptAsync(image, (el: HTMLImageElement, done: any) => {
+    const png: string = await this.scriptAsync(image, (el: HTMLImageElement, done: any) => {
       const url = el.getAttribute('src')
       const img = new Image()
       img.setAttribute('crossOrigin', 'anonymous')
@@ -35,10 +35,10 @@ export class Screenshot extends Base {
       }
     })
 
-    let base64Data = png.substr(22)
+    let base64Data = png.substr('data:image/png;base64,'.length)
 
     if (filePath) {
-      return await new Promise((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         fs.writeFile(filePath, base64Data, 'base64', (err) => {
           if (err) return reject(err)
           resolve(base64Data)
@@ -106,7 +106,7 @@ export class Screenshot extends Base {
     }
 
     if (filePath) {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<string>((resolve, reject) => {
         fs.writeFile(<string>filePath, base64Data, 'base64', err => {
           if (err) return reject(err)
           resolve(base64Data)
@@ -137,7 +137,7 @@ export class Screenshot extends Base {
 
     const screen = await this.captureTab()
 
-    const png = await this.execute((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
+    const png: string = await this.execute((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
       const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
       const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 
@@ -159,7 +159,7 @@ export class Screenshot extends Base {
     const base64Data = png.substr('data:image/png;base64,'.length)
 
     if (filePath) {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<string>((resolve, reject) => {
         fs.writeFile(<string>filePath, base64Data, 'base64', err => {
           if (err) return reject(err)
           resolve(base64Data)
