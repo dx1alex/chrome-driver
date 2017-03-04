@@ -1,3 +1,4 @@
+export * from '../browser';
 import { Browser, Capabilities, PauseSettings, Timeouts } from '../browser';
 import { ChromeExtension } from './extension';
 import { ChromeProxy } from './proxy';

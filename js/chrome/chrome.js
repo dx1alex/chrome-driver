@@ -1,5 +1,9 @@
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("../browser"));
 const browser_1 = require("../browser");
 const path = require("path");
 const helpers_1 = require("../helpers");

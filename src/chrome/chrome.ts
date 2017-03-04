@@ -1,3 +1,5 @@
+export * from '../browser'
+
 import {
   Browser,
   Capabilities,
