@@ -5,7 +5,7 @@ export interface Navigate extends Utils {
 }
 
 export class Navigate extends Base {
-  async url(url: string, pause = 0) {
+  async url(url?: string, pause = 0) {
     if (url) {
       await this.webdriver.go({ url })
       await this.sleep(pause || this.options.pause.navigate)
