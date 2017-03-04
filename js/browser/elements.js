@@ -4,7 +4,8 @@ const base_1 = require("./base");
 class Elements extends base_1.Base {
     async getElement(selector, parent) {
         try {
-            return this.element(selector, parent);
+            // return await
+            return await this.element(selector, parent);
         }
         catch (err) {
             if (err.statusCode && err.statusCode == 7)

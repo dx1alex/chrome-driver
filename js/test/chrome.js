@@ -13,7 +13,7 @@ main();
 async function main() {
     try {
         await bro.start('https://vk.com/about');
-        await bro.screenshot('/tmp/4.png');
+        await bro.getElement('#ddfdsdf');
         await bro.sleep(1000);
         console.log(JSON.stringify(bro.lastCommand()));
     }

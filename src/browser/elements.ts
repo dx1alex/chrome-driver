@@ -6,7 +6,8 @@ export class Elements extends Base {
   getElement(selector: Selector, parent?: Selector): Promise<WebElement | null>
   async getElement(selector?: Selector, parent?: Selector): Promise<WebElement | null> {
     try {
-      return this.element(selector, parent)
+      // return await
+      return await this.element(selector, parent)
     } catch (err) {
       if (err.statusCode && err.statusCode == 7) return Promise.resolve(null)
       throw err
