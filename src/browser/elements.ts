@@ -8,7 +8,7 @@ export class Elements extends Base {
     try {
       return this.element(selector, parent)
     } catch (err) {
-      if (err.state && err.state == 7) return Promise.resolve(null)
+      if (err.statusCode && err.statusCode == 7) return Promise.resolve(null)
       throw err
     }
   }
