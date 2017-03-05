@@ -7,14 +7,16 @@ export interface Utils extends Elements {
 
 export class Utils extends Base {
 
-  pause(action: keyof PauseSettings, value: number): void
-  pause(options: PauseSettings): void
+  pause(action: keyof PauseSettings, value: number): PauseSettings
+  pause(options: PauseSettings): PauseSettings
   pause(options: PauseSettings | keyof PauseSettings, value?: number) {
+    const old = { ...this.options.pause }
     if (typeof options === 'string') {
       this.options.pause[options] = value
       return
     }
     Object.assign(this.options.pause, options)
+    return old
   }
 
   sleep(ms: number, ms2 = 0): Promise<void> {

@@ -6,18 +6,18 @@ export interface Exec extends Elements {
 
 export class Exec extends Base {
 
-  execute(code: string | Function, ...args: any[]) {
+  execute<T>(code: string | Function, ...args: any[]): Promise<T> {
     let script = '' + code
     if (typeof code === 'function') {
       if (script.startsWith('async')) {
-        return this.executeAsync(code, ...args)
+        return this.executeAsync<T>(code, ...args)
       }
       script = `return (${script}).apply(null, arguments)`
     }
     return this.webdriver.executeScript({ script, args })
   }
 
-  async executeAsync(code: string | Function, ...args: any[]) {
+  async executeAsync<T>(code: string | Function, ...args: any[]): Promise<T> {
     const script = typeof code === 'function'
       ? `let done = arguments[arguments.length -1];      
       let result = (${code}).apply(null, arguments);
@@ -34,7 +34,7 @@ export class Exec extends Base {
     return res
   }
 
-  async script(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
+  async script<T>(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
     let sel
     if (Array.isArray(selector)) {
       sel = []
@@ -44,10 +44,10 @@ export class Exec extends Base {
     } else {
       sel = typeof selector === 'string' ? await this.element(selector) : selector
     }
-    return this.execute(code, sel, ...args)
+    return this.execute<T>(code, sel, ...args)
   }
 
-  async scriptAll(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
+  async scriptAll<T>(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
     let sel: any[]
     if (Array.isArray(selector)) {
       sel = []
@@ -57,10 +57,10 @@ export class Exec extends Base {
     } else {
       sel = typeof selector === 'string' ? await this.elements(selector) : [selector]
     }
-    return this.execute(code, sel, ...args)
+    return this.execute<T>(code, sel, ...args)
   }
 
-  async scriptAllAsync(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
+  async scriptAllAsync<T>(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
     let sel: any[]
     if (Array.isArray(selector)) {
       sel = []
@@ -70,10 +70,10 @@ export class Exec extends Base {
     } else {
       sel = typeof selector === 'string' ? await this.elements(selector) : [selector]
     }
-    return this.executeAsync(code, sel, ...args)
+    return this.executeAsync<T>(code, sel, ...args)
   }
 
-  async scriptAsync(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
+  async scriptAsync<T>(selector: Selector | Selector[], code: string | Function, ...args: any[]) {
     let sel
     if (Array.isArray(selector)) {
       sel = []
@@ -83,7 +83,7 @@ export class Exec extends Base {
     } else {
       sel = typeof selector === 'string' ? await this.element(selector) : selector
     }
-    return this.executeAsync(code, sel, ...args)
+    return this.executeAsync<T>(code, sel, ...args)
   }
 
   //TODO fn

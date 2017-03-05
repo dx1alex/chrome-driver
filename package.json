@@ -1,6 +1,6 @@
 {
     "name": "chrome-driver",
-    "version": "1.2.7",
+    "version": "1.3.0",
     "description": "chrome-driver",
     "main": "js/index",
     "types": "js/index.d.ts",

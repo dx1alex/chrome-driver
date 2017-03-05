@@ -11,7 +11,7 @@ import {
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { getDateTime, applyMixins } from '../helpers'
+import { getDateTime, applyMixins, setArgs } from '../helpers'
 
 import { ChromeExtension } from './extension'
 import { ChromeProxy } from './proxy'
@@ -215,26 +215,6 @@ applyMixins(Chrome, [
 
 export interface Chrome extends
   ChromeExtension, ChromeProxy, ChromeTabs, ChromeDump, ChromeCapture {
-}
-
-function setArgs(args: Array<string>, key: string, value?: string | boolean) {
-  let i = args.findIndex(v => v.split('=')[0] === key)
-  if (typeof value === 'string') {
-    const val = key + '=' + value
-    if (i >= 0) {
-      args[i] = val
-    } else {
-      args.push(val)
-      i = args.length - 1
-    }
-  } else if (i < 0 && (value || value == null)) {
-    args.push(key)
-    i = args.length - 1
-  } else if (i >= 0) {
-    args.splice(i, 1)
-    i = -1
-  }
-  return i
 }
 
 export interface ChromeOptions extends ChromeStartOptions {

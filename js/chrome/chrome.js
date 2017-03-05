@@ -70,13 +70,13 @@ class Chrome extends browser_1.Browser {
                     break;
                 }
             }
-            setArgs(chromeOptions.args, 'user-data-dir', userDataDir);
+            helpers_1.setArgs(chromeOptions.args, 'user-data-dir', userDataDir);
         }
         if (options.useragent) {
-            setArgs(chromeOptions.args, 'user-agent', options.useragent);
+            helpers_1.setArgs(chromeOptions.args, 'user-agent', options.useragent);
         }
         if (options.enableFlash) {
-            setArgs(chromeOptions.args, 'disable-bundled-ppapi-flash', false);
+            helpers_1.setArgs(chromeOptions.args, 'disable-bundled-ppapi-flash', false);
         }
         if (options.proxy) {
             let proxy = options.proxy.split('@').reverse()[0];
@@ -125,10 +125,10 @@ class Chrome extends browser_1.Browser {
             return 0;
         }
         else if (typeof args === 'string') {
-            return setArgs(this.options.desiredCapabilities.chromeOptions.args, args, value);
+            return helpers_1.setArgs(this.options.desiredCapabilities.chromeOptions.args, args, value);
         }
         for (let k of Object.keys(args)) {
-            setArgs(this.options.desiredCapabilities.chromeOptions.args, k, value);
+            helpers_1.setArgs(this.options.desiredCapabilities.chromeOptions.args, k, value);
         }
         return 0;
     }
@@ -184,25 +184,3 @@ exports.Chrome = Chrome;
 helpers_1.applyMixins(Chrome, [
     extension_1.ChromeExtension, proxy_1.ChromeProxy, tabs_1.ChromeTabs, dump_1.ChromeDump, capture_1.ChromeCapture
 ]);
-function setArgs(args, key, value) {
-    let i = args.findIndex(v => v.split('=')[0] === key);
-    if (typeof value === 'string') {
-        const val = key + '=' + value;
-        if (i >= 0) {
-            args[i] = val;
-        }
-        else {
-            args.push(val);
-            i = args.length - 1;
-        }
-    }
-    else if (i < 0 && (value || value == null)) {
-        args.push(key);
-        i = args.length - 1;
-    }
-    else if (i >= 0) {
-        args.splice(i, 1);
-        i = -1;
-    }
-    return i;
-}

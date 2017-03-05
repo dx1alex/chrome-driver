@@ -15,7 +15,6 @@ async function main() {
   try {
     await bro.start('https://vk.com/about')
     await bro.getElement('#ddfdsdf')
-
     await bro.sleep(1000)
     console.log(JSON.stringify(bro.lastCommand()))
   } catch (err) {

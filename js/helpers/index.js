@@ -17,3 +17,26 @@ function getDateTime(d = new Date()) {
         + `${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}:${('0' + d.getSeconds()).slice(-2)}.${(d.getMilliseconds())}`;
 }
 exports.getDateTime = getDateTime;
+function setArgs(args, key, value) {
+    let i = args.findIndex(v => v.split('=')[0] === key);
+    if (typeof value === 'string') {
+        const val = key + '=' + value;
+        if (i >= 0) {
+            args[i] = val;
+        }
+        else {
+            args.push(val);
+            i = args.length - 1;
+        }
+    }
+    else if (i < 0 && (value || value == null)) {
+        args.push(key);
+        i = args.length - 1;
+    }
+    else if (i >= 0) {
+        args.splice(i, 1);
+        i = -1;
+    }
+    return i;
+}
+exports.setArgs = setArgs;
