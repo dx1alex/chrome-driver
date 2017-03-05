@@ -5,6 +5,9 @@ class State extends base_1.Base {
     async isExists(selector) {
         return (await this.elements(selector)).length > 0;
     }
+    async notExists(selector) {
+        return !((await this.elements(selector)).length > 0);
+    }
     async isSelected(selector) {
         return this.webdriver.isElementSelected({ id: await this.elementId(selector) });
     }

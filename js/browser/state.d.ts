@@ -6,6 +6,7 @@ export interface State extends Elements, Exec, Getter {
 }
 export declare class State extends Base {
     isExists(selector: Selector): Promise<boolean>;
+    notExists(selector: Selector): Promise<boolean>;
     isSelected(selector: Selector): Promise<boolean>;
     isEnabled(selector: Selector): Promise<boolean>;
     isFocused(selector: Selector): Promise<boolean>;
