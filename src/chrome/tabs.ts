@@ -4,7 +4,7 @@ import { ChromeExtension } from './extension'
 export interface ChromeTabs extends ChromeExtension {
 }
 
-export class ChromeTabs extends Base {
+export abstract class ChromeTabs extends Base {
 
   fullscreen() {
     return this.extension(() => {

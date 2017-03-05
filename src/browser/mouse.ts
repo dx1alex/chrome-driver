@@ -5,7 +5,7 @@ import { Utils } from './utils'
 export interface Mouse extends Utils, Elements {
 }
 
-export class Mouse extends Base {
+export abstract class Mouse extends Base {
 
   async click(selector: Selector | Array<Selector>, pause?: number) {
     if (!Array.isArray(selector)) {

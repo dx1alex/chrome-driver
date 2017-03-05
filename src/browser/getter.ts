@@ -8,7 +8,7 @@ import { Navigate } from './navigate'
 export interface Getter extends Elements, Exec, Tabs, Navigate {
 }
 
-export class Getter extends Base {
+export abstract class Getter extends Base {
 
   title() {
     return this.webdriver.getTitle()

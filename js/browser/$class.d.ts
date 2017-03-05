@@ -3,7 +3,7 @@ import { UnicodeKeys } from '../helpers/';
 import { Elements } from './elements';
 export interface $Class extends Elements {
 }
-export declare class $Class extends Base {
+export declare abstract class $Class extends Base {
     private static _$List;
     $(selector: Selector): $Element;
 }

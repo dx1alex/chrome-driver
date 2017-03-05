@@ -1,6 +1,6 @@
 import { Base, Capabilities } from './base'
 
-export class Sessions extends Base {
+export abstract class Sessions extends Base {
 
   getSession(sessionId?: string) {
     if (!sessionId) sessionId = this.sessionId

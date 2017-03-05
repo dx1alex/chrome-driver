@@ -5,7 +5,7 @@ import { Elements } from './elements'
 export interface $Class extends Elements {
 }
 
-export class $Class extends Base {
+export abstract class $Class extends Base {
 
   private static _$List: string[] = [
     'script', 'scriptAll', 'scriptAllAsync', 'scriptAsync', 'html', 'text', 'tagName', 'attr', 'prop', 'css',

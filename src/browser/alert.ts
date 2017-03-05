@@ -1,6 +1,6 @@
 import { Base } from "./base"
 
-export class Alert extends Base {
+export abstract class Alert extends Base {
 
   setAlert(text: string) {
     return this.webdriver.setAlertText({ text })

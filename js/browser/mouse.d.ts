@@ -3,7 +3,7 @@ import { Elements } from './elements';
 import { Utils } from './utils';
 export interface Mouse extends Utils, Elements {
 }
-export declare class Mouse extends Base {
+export declare abstract class Mouse extends Base {
     click(selector: Selector | Array<Selector>, pause?: number): Promise<void>;
     mouseDoubleClick(pause?: number): Promise<void>;
     mouseButtonClick(button?: 0 | 1 | 2, pause?: number): Promise<void>;

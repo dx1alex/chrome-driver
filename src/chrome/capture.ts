@@ -6,7 +6,7 @@ import * as fs from 'fs'
 export interface ChromeCapture extends ChromeExtension {
 }
 
-export class ChromeCapture extends Base {
+export abstract class ChromeCapture extends Base {
 
   async captureTab() {
     const png = await this.extension<string>(() => {

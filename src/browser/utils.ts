@@ -5,7 +5,7 @@ import { Elements } from './elements'
 export interface Utils extends Elements {
 }
 
-export class Utils extends Base {
+export abstract class Utils extends Base {
 
   pause(action: keyof PauseSettings, value: number): PauseSettings
   pause(options: PauseSettings): PauseSettings

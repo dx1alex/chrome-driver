@@ -1,6 +1,6 @@
 import { Base } from './base'
 
-export class Storage extends Base {
+export abstract class Storage extends Base {
 
   localStorage(): Promise<string[]>
   localStorage(key: string): Promise<string>

@@ -10,7 +10,7 @@ import * as fs from 'fs'
 export interface ChromeDump extends ChromeExtension, CommandHistory, Getter, Screenshot {
 }
 
-export class ChromeDump extends Base {
+export abstract class ChromeDump extends Base {
 
   async saveAsMHTML(filePath: string) {
     const mhtml = await this.extension<string>(() => saveAsMHTML())

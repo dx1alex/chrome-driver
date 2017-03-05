@@ -5,7 +5,7 @@ import * as URL from 'url'
 export interface ChromeProxy extends ChromeExtension {
 }
 
-export class ChromeProxy extends Base {
+export abstract class ChromeProxy extends Base {
 
   clearProxy() {
     return this.extension(() => {

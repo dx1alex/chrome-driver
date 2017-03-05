@@ -5,7 +5,7 @@ import { Tabs } from './tabs'
 export interface Scroll extends Exec, Tabs {
 }
 
-export class Scroll extends Base {
+export abstract class Scroll extends Base {
   //TODO оптимизировать чтобы offsetTop при alignToTop == 'center' вычислялся на стороне браузера
   async scroll(selector: Selector, alignToTop: boolean | 'top' | 'bottom' | 'center' = true, offsetTop = 0) {
     if (alignToTop === 'top') alignToTop = true

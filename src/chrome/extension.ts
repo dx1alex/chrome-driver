@@ -4,7 +4,7 @@ import { Exec } from '../browser/exec'
 export interface ChromeExtension extends Exec {
 }
 
-export class ChromeExtension extends Base {
+export abstract class ChromeExtension extends Base {
 
   extension<T>(code: string | Function, ...args: any[]) {
     let script = '' + code

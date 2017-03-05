@@ -4,7 +4,7 @@ import { Elements } from './elements'
 export interface Frames extends Elements {
 }
 
-export class Frames extends Base {
+export abstract class Frames extends Base {
 
   async switchFrame(frame: Selector | number | null) {
     const id = typeof frame === 'number' || frame === null ? frame : await this.elementId(frame)

@@ -4,7 +4,7 @@ import { Exec } from './exec';
 import { Getter } from './getter';
 export interface State extends Elements, Exec, Getter {
 }
-export declare class State extends Base {
+export declare abstract class State extends Base {
     isExists(selector: Selector): Promise<boolean>;
     notExists(selector: Selector): Promise<boolean>;
     isSelected(selector: Selector): Promise<boolean>;

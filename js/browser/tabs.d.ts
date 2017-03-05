@@ -2,7 +2,7 @@ import { Base } from './base';
 import { Exec } from './exec';
 export interface Tabs extends Exec {
 }
-export declare class Tabs extends Base {
+export declare abstract class Tabs extends Base {
     maximize(windowHandle?: string): Promise<void>;
     setPosition(x: number, y: number, windowHandle?: string): Promise<any>;
     getPosition(windowHandle?: string): Promise<{

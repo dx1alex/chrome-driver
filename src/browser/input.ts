@@ -9,7 +9,7 @@ import { Utils } from './utils'
 export interface Input extends Utils, Elements, Getter, Exec, Mouse {
 }
 
-export class Input extends Base {
+export abstract class Input extends Base {
 
   async keys(selector: Selector, ...keys: Array<number | boolean | string | Array<UnicodeKeys>>) {
     let value: string[] = []

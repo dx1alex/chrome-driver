@@ -1,6 +1,6 @@
 import { Base, Cookie } from './base'
 
-export class Cookies extends Base {
+export abstract class Cookies extends Base {
 
   setCookie(cookie: Cookie) {
     return this.webdriver.setCookie({ cookie })

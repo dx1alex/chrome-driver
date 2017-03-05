@@ -7,7 +7,7 @@ import { Mouse } from './mouse';
 import { Utils } from './utils';
 export interface Input extends Utils, Elements, Getter, Exec, Mouse {
 }
-export declare class Input extends Base {
+export declare abstract class Input extends Base {
     keys(selector: Selector, ...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
     type(selector: Selector, ...keys: Array<number | boolean | string | Array<UnicodeKeys>>): Promise<void>;
     sendKeys(...keys: Array<string | Array<UnicodeKeys>>): Promise<void>;

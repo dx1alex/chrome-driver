@@ -5,7 +5,7 @@ import { Tabs } from './tabs';
 import { Navigate } from './navigate';
 export interface Getter extends Elements, Exec, Tabs, Navigate {
 }
-export declare class Getter extends Base {
+export declare abstract class Getter extends Base {
     title(): Promise<string>;
     html(selector?: Selector): Promise<string>;
     text(selector?: Selector): Promise<string>;

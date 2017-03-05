@@ -5,7 +5,7 @@ import { Getter } from './getter';
 import { Scroll } from './scroll';
 export interface Screenshot extends Scroll, Getter, Elements, Exec {
 }
-export declare class Screenshot extends Base {
+export declare abstract class Screenshot extends Base {
     getImage(image: Selector, filePath?: string): Promise<string>;
     screenshot(filePath?: string | boolean, fullPage?: boolean): Promise<string>;
     capture(selector: Selector, filePath?: string | {

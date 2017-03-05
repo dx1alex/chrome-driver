@@ -5,7 +5,7 @@ import * as URL from 'url'
 export interface Navigate extends Utils {
 }
 
-export class Navigate extends Base {
+export abstract class Navigate extends Base {
 
   async go(url: string, pause = 0) {
     await this.webdriver.go({ url })

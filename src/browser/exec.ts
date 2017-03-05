@@ -4,7 +4,7 @@ import { Elements } from './elements'
 export interface Exec extends Elements {
 }
 
-export class Exec extends Base {
+export abstract class Exec extends Base {
 
   execute<T>(code: string | Function, ...args: any[]): Promise<T> {
     let script = '' + code

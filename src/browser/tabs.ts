@@ -4,7 +4,7 @@ import { Exec } from './exec'
 export interface Tabs extends Exec {
 }
 
-export class Tabs extends Base {
+export abstract class Tabs extends Base {
 
   maximize(windowHandle = 'current') {
     return this.webdriver.maximizeWindow({ windowHandle })

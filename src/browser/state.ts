@@ -6,7 +6,7 @@ import { Getter } from './getter'
 export interface State extends Elements, Exec, Getter {
 }
 
-export class State extends Base {
+export abstract class State extends Base {
 
   async isExists(selector: Selector) {
     return (await this.elements(selector)).length > 0

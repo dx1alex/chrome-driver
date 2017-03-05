@@ -1,5 +1,5 @@
 import { Base, Selector, WebElement } from './base';
-export declare class Elements extends Base {
+export declare abstract class Elements extends Base {
     getElement(): Promise<WebElement | null>;
     getElement(selector: Selector, parent?: Selector): Promise<WebElement | null>;
     element(): Promise<WebElement>;

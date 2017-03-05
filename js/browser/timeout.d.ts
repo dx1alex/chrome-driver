@@ -1,4 +1,4 @@
 import { Base, Timeouts } from './base';
-export declare class Timeout extends Base {
+export declare abstract class Timeout extends Base {
     setTimeouts(timeouts: Timeouts): Promise<void>;
 }

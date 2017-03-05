@@ -1,6 +1,6 @@
 import { Base, Selector, WebElement, LocatorStrategy } from './base'
 
-export class Elements extends Base {
+export abstract class Elements extends Base {
 
   getElement(): Promise<WebElement | null>
   getElement(selector: Selector, parent?: Selector): Promise<WebElement | null>

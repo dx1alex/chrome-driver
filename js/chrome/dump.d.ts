@@ -5,7 +5,7 @@ import { Getter } from '../browser/getter';
 import { Screenshot } from '../browser/screenshot';
 export interface ChromeDump extends ChromeExtension, CommandHistory, Getter, Screenshot {
 }
-export declare class ChromeDump extends Base {
+export declare abstract class ChromeDump extends Base {
     saveAsMHTML(filePath: string): Promise<string>;
     dump(dir?: string): Promise<[void, void, string, string, string]>;
 }

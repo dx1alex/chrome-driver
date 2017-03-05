@@ -1,6 +1,6 @@
 import { Base } from './base'
 
-export class CommandHistory extends Base {
+export abstract class CommandHistory extends Base {
 
   protected _lastError: CommandHistoryObject
   protected _lastCommand: CommandHistoryObject

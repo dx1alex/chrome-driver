@@ -3,7 +3,7 @@ import { Exec } from './exec';
 import { Tabs } from './tabs';
 export interface Scroll extends Exec, Tabs {
 }
-export declare class Scroll extends Base {
+export declare abstract class Scroll extends Base {
     scroll(selector: Selector, alignToTop?: boolean | 'top' | 'bottom' | 'center', offsetTop?: number): Promise<void>;
     scrollToElement(selector: Selector, parent: Selector, alignToTop?: boolean | 'top' | 'bottom' | 'center', offsetTop?: number): void;
     scrollBy(top: number, left?: number): Promise<void>;

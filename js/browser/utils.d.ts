@@ -2,7 +2,7 @@ import { Base, Selector, PauseSettings } from './base';
 import { Elements } from './elements';
 export interface Utils extends Elements {
 }
-export declare class Utils extends Base {
+export declare abstract class Utils extends Base {
     pause(action: keyof PauseSettings, value: number): PauseSettings;
     pause(options: PauseSettings): PauseSettings;
     sleep(ms: number, ms2?: number): Promise<void>;

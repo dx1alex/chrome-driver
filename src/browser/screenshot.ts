@@ -9,7 +9,7 @@ import { Scroll } from './scroll'
 export interface Screenshot extends Scroll, Getter, Elements, Exec {
 }
 
-export class Screenshot extends Base {
+export abstract class Screenshot extends Base {
 
   async getImage(image: Selector, filePath?: string) {
     const png = await this.scriptAsync<string>(image, (el: HTMLImageElement, done: any) => {
