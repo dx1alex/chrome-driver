@@ -13,7 +13,8 @@ main();
 async function main() {
     try {
         await bro.start();
-        let url = await bro.url('https://vk.com');
+        let url = await bro.url.parse();
+        url = await bro.url.startsWith('https://vk.com');
         console.log('url', url);
         console.log(JSON.stringify(bro.lastCommand()));
     }
