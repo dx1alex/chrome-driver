@@ -7,10 +7,10 @@ export interface Getter extends Elements, Exec, Tabs, Navigate {
 }
 export declare class Getter extends Base {
     title(): Promise<string>;
-    html(selector?: Selector): Promise<any>;
+    html(selector?: Selector): Promise<string>;
     text(selector?: Selector): Promise<string>;
     tagName(selector: Selector): Promise<string>;
-    attr(selector: Selector, attr: string): Promise<any>;
+    attr(selector: Selector, attr: string): Promise<string>;
     prop(selector: Selector, prop: string): Promise<any>;
     css(selector: Selector, propertyName: string): Promise<string>;
     classList(selector: Selector): Promise<string[]>;

@@ -37,7 +37,7 @@ export class Scroll extends Base {
     }
     left = top
     top = selector
-    return this.execute((top = 0, left = 0) => scrollBy(left, top), top, left)
+    return this.execute<void>((top = 0, left = 0) => scrollBy(left, top), top, left)
   }
 
   scrollTo(top?: number, left?: number): Promise<void>
@@ -55,17 +55,17 @@ export class Scroll extends Base {
     top = selector
     if (top < 0) top = Number.MAX_SAFE_INTEGER
     if (left < 0) left = Number.MAX_SAFE_INTEGER
-    return this.execute((top = 0, left = 0) => scrollTo(left, top), top, left)
+    return this.execute<void>((top = 0, left = 0) => scrollTo(left, top), top, left)
   }
 
   scrollTop(selector: Selector, px: number): Promise<number> {
     if (px < 0) px = Number.MAX_SAFE_INTEGER
-    return this.script(selector, (el: HTMLElement, px: number) => el.scrollTop = px, px)
+    return this.script<number>(selector, (el: HTMLElement, px: number) => el.scrollTop = px, px)
   }
 
   scrollLeft(selector: Selector, px: number): Promise<number> {
     if (px < 0) px = Number.MAX_SAFE_INTEGER
-    return this.script(selector, (el: HTMLElement, px: number) => el.scrollLeft = px, px)
+    return this.script<number>(selector, (el: HTMLElement, px: number) => el.scrollLeft = px, px)
   }
 
 }

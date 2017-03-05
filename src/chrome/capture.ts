@@ -9,7 +9,7 @@ export interface ChromeCapture extends ChromeExtension {
 export class ChromeCapture extends Base {
 
   async captureTab() {
-    const png: string = await this.extension(() => {
+    const png = await this.extension<string>(() => {
       return new Promise((resolve, reject) => {
         chrome.tabs.captureVisibleTab({ format: 'png' }, resolve)
       })

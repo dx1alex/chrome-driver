@@ -12,7 +12,7 @@ export interface Screenshot extends Scroll, Getter, Elements, Exec {
 export class Screenshot extends Base {
 
   async getImage(image: Selector, filePath?: string) {
-    const png: string = await this.scriptAsync(image, (el: HTMLImageElement, done: any) => {
+    const png = await this.scriptAsync<string>(image, (el: HTMLImageElement, done: any) => {
       const url = el.getAttribute('src')
       const img = new Image()
       img.setAttribute('crossOrigin', 'anonymous')
@@ -74,7 +74,7 @@ export class Screenshot extends Base {
         if (scroll < 0) scroll = 0
       }
 
-      const png = await this.execute((screens: any[]) => {
+      const png = await this.execute<string>((screens: any[]) => {
         console.log('screenshot')
         const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
         const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -137,7 +137,7 @@ export class Screenshot extends Base {
 
     const screen = await this.captureTab()
 
-    const png: string = await this.execute((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
+    const png = await this.execute<string>((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
       const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
       const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 

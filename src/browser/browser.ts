@@ -39,6 +39,7 @@ import { CommandHistory, CommandHistoryObject } from './command-history'
 import { $Class } from './$class'
 
 import * as fs from 'fs'
+import * as URL from 'url'
 
 export class Browser extends Base {
   protected static _no_command_history_list: string[] = ['waitFor']
@@ -84,7 +85,7 @@ export class Browser extends Base {
           return Reflect.get(browser, command, r)
         }
 
-        return (...args: any[]) => {
+        const fn = (...args: any[]) => {
           const date = new Date(),
             err = new Error,
             stack = err.stack.split('\n').slice(1).join('\n'),
@@ -133,6 +134,23 @@ export class Browser extends Base {
 
           return res
         }
+
+        if (command === 'url') {
+          return new Proxy(fn, {
+            get: (target, key, thisArg) => {
+              return async (...args: any[]) => {
+                const url = await this.webdriver.getCurrentURL()
+                if (key === 'parse') return URL.parse(url, true)
+                if (typeof String.prototype[key] !== 'function')
+                  throw TypeError(`String.prototype.${key} is not a function`)
+
+                return url[key](...args)
+              }
+            }
+          })
+        }
+
+        return fn
       }
     })
   }

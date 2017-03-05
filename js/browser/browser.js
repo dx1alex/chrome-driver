@@ -26,6 +26,7 @@ const timeout_1 = require("./timeout");
 const command_history_1 = require("./command-history");
 const _class_1 = require("./$class");
 const fs = require("fs");
+const URL = require("url");
 class Browser extends base_1.Base {
     constructor(options) {
         super();
@@ -58,7 +59,7 @@ class Browser extends base_1.Base {
                 if (typeof this[command] !== 'function' || new.target._no_proxy_list.includes(command)) {
                     return Reflect.get(browser, command, r);
                 }
-                return (...args) => {
+                const fn = (...args) => {
                     const date = new Date(), err = new Error, stack = err.stack.split('\n').slice(1).join('\n'), strArgs = JSON.stringify(args.map(arg => typeof arg === 'function' ? arg.name : arg));
                     const lastCommand = { command, args, date, stack };
                     if (!this.options.noCommandHistory && !new.target._no_command_history_list.includes(command)) {
@@ -96,6 +97,21 @@ class Browser extends base_1.Base {
                     }
                     return res;
                 };
+                if (command === 'url') {
+                    return new Proxy(fn, {
+                        get: (target, key, thisArg) => {
+                            return async (...args) => {
+                                const url = await this.webdriver.getCurrentURL();
+                                if (key === 'parse')
+                                    return URL.parse(url, true);
+                                if (typeof String.prototype[key] !== 'function')
+                                    throw TypeError(`String.prototype.${key} is not a function`);
+                                return url[key](...args);
+                            };
+                        }
+                    });
+                }
+                return fn;
             }
         });
     }

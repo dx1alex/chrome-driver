@@ -29,11 +29,11 @@ export class Getter extends Base {
   }
 
   attr(selector: Selector, attr: string) {
-    return this.script(selector, (el: HTMLElement, attr: string) => el.getAttribute(attr), attr)
+    return this.script<string>(selector, (el: HTMLElement, attr: string) => el.getAttribute(attr), attr)
   }
 
   prop(selector: Selector, prop: string) {
-    return this.script(selector, (el: HTMLElement, prop: string) => el[prop], prop)
+    return this.script<any>(selector, (el: HTMLElement, prop: string) => el[prop], prop)
   }
 
   async css(selector: Selector, propertyName: string) {

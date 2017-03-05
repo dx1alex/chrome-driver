@@ -3,8 +3,8 @@ import { Elements } from './elements';
 export interface Utils extends Elements {
 }
 export declare class Utils extends Base {
-    pause(action: keyof PauseSettings, value: number): void;
-    pause(options: PauseSettings): void;
+    pause(action: keyof PauseSettings, value: number): PauseSettings;
+    pause(options: PauseSettings): PauseSettings;
     sleep(ms: number, ms2?: number): Promise<void>;
     sleeps(sec: number, sec2?: number): Promise<void>;
     waitUntil(fn: Function, settings: {

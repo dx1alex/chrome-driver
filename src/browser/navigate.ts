@@ -1,14 +1,11 @@
 import { Base, Selector } from './base'
 import { Utils } from './utils'
+import * as URL from 'url'
 
 export interface Navigate extends Utils {
 }
 
 export class Navigate extends Base {
-  async url(url?: string, pause = 0) {
-    if (url) await this.go(url, pause)
-    return this.webdriver.getCurrentURL()
-  }
 
   async go(url: string, pause = 0) {
     await this.webdriver.go({ url })
@@ -30,5 +27,19 @@ export class Navigate extends Base {
     await this.sleep(pause || this.options.pause.navigate)
   }
 
+}
+
+Navigate.prototype.url = async function url(url?: string, pause = 0): Promise<string> {
+  if (url) await this.go(url, pause)
+  return this.webdriver.getCurrentURL()
+} as NavigateUrl
+
+export interface Navigate {
+  url: NavigateUrl
+}
+
+export interface NavigateUrl extends String {
+  (url?: string, pause?: number): Promise<string>
+  parse: () => URL.Url
 }
 

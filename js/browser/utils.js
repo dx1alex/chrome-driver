@@ -4,11 +4,13 @@ const base_1 = require("./base");
 const state_1 = require("./state");
 class Utils extends base_1.Base {
     pause(options, value) {
+        const old = Object.assign({}, this.options.pause);
         if (typeof options === 'string') {
             this.options.pause[options] = value;
             return;
         }
         Object.assign(this.options.pause, options);
+        return old;
     }
     sleep(ms, ms2 = 0) {
         if (ms2) {

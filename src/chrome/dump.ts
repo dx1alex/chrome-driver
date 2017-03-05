@@ -13,7 +13,7 @@ export interface ChromeDump extends ChromeExtension, CommandHistory, Getter, Scr
 export class ChromeDump extends Base {
 
   async saveAsMHTML(filePath: string) {
-    const mhtml: string = await this.extension(() => saveAsMHTML())
+    const mhtml = await this.extension<string>(() => saveAsMHTML())
 
     const base64Data = mhtml.substr('data:;base64,'.length)
 
