@@ -12,6 +12,10 @@ export class State extends Base {
     return (await this.elements(selector)).length > 0
   }
 
+  async notExists(selector: Selector) {
+    return !((await this.elements(selector)).length > 0)
+  }
+
   async isSelected(selector: Selector) {
     return this.webdriver.isElementSelected({ id: await this.elementId(selector) })
   }
