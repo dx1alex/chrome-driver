@@ -8,17 +8,24 @@ let options = {
     dataDir: '/tmp/test0',
     onSessionExests: 'restart',
 };
-const bro = new chrome_1.Chrome(options);
+class C extends chrome_1.Chrome {
+    constructor(options) {
+        super(options);
+    }
+    isMob() {
+        return this._.url.startsWith('https://m.vk.com');
+    }
+}
+const bro = new C(options);
 main();
 async function main() {
     try {
-        await bro.start('https://vk.com');
+        await bro.start('https://m.vk.com');
         let url = await bro.url.parse();
         url = await bro.url.startsWith('https://vk.com');
         console.log('url', url);
-        let title = await bro.title();
-        console.log('title', title);
-        title = await bro.title.toUpperCase();
+        console.log('is mob', await bro.isMob());
+        let title = await bro.title.toUpperCase();
         console.log('title', title);
         console.log(JSON.stringify(bro.lastCommand()));
     }

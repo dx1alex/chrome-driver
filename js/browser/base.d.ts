@@ -8,7 +8,7 @@ export declare abstract class Base {
     capabilities: Capabilities;
     sessionId: string;
     started: boolean;
-    protected _this_proxy: this;
+    protected _: this;
     protected static _no_command_history_list: string[];
     protected static _no_proxy_list: string[];
     protected static DEFAULT_WAIT_TIMEOUT: number;

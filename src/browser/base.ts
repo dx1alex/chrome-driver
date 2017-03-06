@@ -17,7 +17,7 @@ export abstract class Base {
   sessionId = ''
   started = false
 
-  protected _this_proxy = this
+  protected _ = this
 
   protected static _no_command_history_list: string[] = []
   protected static _no_proxy_list: string[] = []

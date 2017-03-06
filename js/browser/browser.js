@@ -54,7 +54,7 @@ class Browser extends base_1.Base {
             remote: this.options.remote,
             log: this.logStream
         });
-        return this._this_proxy = new Proxy(this, {
+        return this._ = new Proxy(this, {
             get: (browser, command, r) => {
                 if (typeof this[command] !== 'function' || new.target._no_proxy_list.includes(command)) {
                     return Reflect.get(browser, command, r);

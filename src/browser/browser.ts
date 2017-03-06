@@ -79,7 +79,7 @@ export class Browser extends Base {
       log: this.logStream
     })
 
-    return this._this_proxy = new Proxy(this, {
+    return this._ = new Proxy(this, {
       get: (browser, command: string, r) => {
         if (typeof this[command] !== 'function' || new.target._no_proxy_list.includes(command)) {
           return Reflect.get(browser, command, r)

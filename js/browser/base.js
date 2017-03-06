@@ -9,7 +9,7 @@ class Base {
     constructor() {
         this.sessionId = '';
         this.started = false;
-        this._this_proxy = this;
+        this._ = this;
         this._numCommand = 0;
         this.commandHistory = [];
     }
