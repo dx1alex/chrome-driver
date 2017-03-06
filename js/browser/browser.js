@@ -99,15 +99,43 @@ class Browser extends base_1.Base {
                 };
                 if (command === 'url') {
                     return new Proxy(fn, {
-                        get: (target, key, thisArg) => {
-                            return async (...args) => {
-                                const url = await this.webdriver.getCurrentURL();
-                                if (key === 'parse')
-                                    return URL.parse(url, true);
-                                if (typeof String.prototype[key] !== 'function')
-                                    throw TypeError(`String.prototype.${key} is not a function`);
-                                return url[key](...args);
-                            };
+                        get: (target, key, thisArg) => async (...args) => {
+                            const url = await this.webdriver.getCurrentURL();
+                            if (key === 'parse')
+                                return URL.parse(url, true);
+                            if (typeof String.prototype[key] !== 'function')
+                                throw TypeError(`String.prototype.${key} is not a function`);
+                            return url[key](...args);
+                        }
+                    });
+                }
+                if (command === 'html') {
+                    return new Proxy(fn, {
+                        get: (target, key, thisArg) => async (...args) => {
+                            const str = await this.webdriver.getSource();
+                            if (typeof String.prototype[key] !== 'function')
+                                throw TypeError(`String.prototype.${key} is not a function`);
+                            return str[key](...args);
+                        }
+                    });
+                }
+                if (command === 'title') {
+                    return new Proxy(fn, {
+                        get: (target, key, thisArg) => async (...args) => {
+                            const str = await this.webdriver.getTitle();
+                            if (typeof String.prototype[key] !== 'function')
+                                throw TypeError(`String.prototype.${key} is not a function`);
+                            return str[key](...args);
+                        }
+                    });
+                }
+                if (command === 'text') {
+                    return new Proxy(fn, {
+                        get: (target, key, thisArg) => async (...args) => {
+                            const str = await this.webdriver.getElementText({ id: await this.elementId('body') });
+                            if (typeof String.prototype[key] !== 'function')
+                                throw TypeError(`String.prototype.${key} is not a function`);
+                            return str[key](...args);
                         }
                     });
                 }

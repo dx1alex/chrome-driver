@@ -63,7 +63,7 @@ export abstract class Screenshot extends Base {
       let scroll = -1
       while (true) {
         await this.scrollTo(scroll)
-        let scrollTop: number = await this.prop(body, 'scrollTop')
+        let scrollTop: number = await this.prop<number>(body, 'scrollTop')
         scrollTop |= 0
         screens.push({
           scrollTop,
