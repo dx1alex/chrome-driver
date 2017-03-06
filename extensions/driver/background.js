@@ -93,6 +93,16 @@ function saveAsMHTML() {
     })
 }
 
+function focused() {
+    return new Promise((resolve, reject) => {
+        chrome.windows.getCurrent(window => {
+            chrome.windows.update(window.id, {
+                focused: true
+            }, resolve);
+        })
+    })
+}
+
 function fullscreen(info, tab) {
     return new Promise((resolve, reject) => {
         chrome.windows.getCurrent(window => {
