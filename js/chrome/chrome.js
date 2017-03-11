@@ -47,7 +47,7 @@ class Chrome extends browser_1.Browser {
             const sessions = await this.webdriver.getSessions();
             for (const v of sessions) {
                 if (v.capabilities.chrome.userDataDir === userDataDir) {
-                    switch (options.onSessionExests) {
+                    switch (options.onSessionExists) {
                         case 'continue':
                             try {
                                 await this.webdriver.getCurrentURL({ sessionId: v.id });

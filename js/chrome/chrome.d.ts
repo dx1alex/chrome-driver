@@ -44,7 +44,7 @@ export interface ChromeStartOptions extends ChromeOptionsCapabilities {
     dataDir?: string;
     user?: string;
     profile?: string;
-    onSessionExests?: 'exception' | 'restart' | 'continue';
+    onSessionExists?: 'exception' | 'restart' | 'continue';
     desiredCapabilities?: ChromeOptionsCapabilities;
 }
 export interface ChromeOptionsCapabilities extends Capabilities {

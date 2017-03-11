@@ -5,7 +5,7 @@ let options: ChromeOptions = {
   window: [0, 0, 1200, 800],
   //log: 'console.info',
   dataDir: '/tmp/test0',
-  onSessionExests: 'restart',
+  onSessionExists: 'restart',
 }
 
 class C extends Chrome {

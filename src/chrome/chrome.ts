@@ -110,7 +110,7 @@ export class Chrome extends Browser {
       const sessions = await this.webdriver.getSessions()
       for (const v of sessions) {
         if (v.capabilities.chrome.userDataDir === userDataDir) {
-          switch (options.onSessionExests) {
+          switch (options.onSessionExists) {
             case 'continue':
               try {
                 await this.webdriver.getCurrentURL({ sessionId: v.id })
@@ -241,7 +241,7 @@ export interface ChromeStartOptions extends ChromeOptionsCapabilities {
   dataDir?: string
   user?: string
   profile?: string
-  onSessionExests?: 'exception' | 'restart' | 'continue'
+  onSessionExists?: 'exception' | 'restart' | 'continue'
   desiredCapabilities?: ChromeOptionsCapabilities
 }
 
