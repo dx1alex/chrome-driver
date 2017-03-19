@@ -29,11 +29,16 @@ class State extends base_1.Base {
     async isVisible(selector) {
         return this.webdriver.isElementDysplayed({ id: await this.elementId(selector) });
     }
-    //TODO
-    //isVisibleInViewport() { }
     async hasText(selector, text) {
-        const re = text instanceof RegExp ? text : new RegExp(text);
-        return re.test(await this.webdriver.getElementText({ id: await this.elementId(selector) }));
+        let regexp;
+        if (!Array.isArray(text)) {
+            regexp = [toRegExp(text)];
+        }
+        else {
+            regexp = text.map(toRegExp);
+        }
+        const textContent = await this.text(selector);
+        return regexp.some(re => re.test(textContent));
     }
     async hasClass(selector, name) {
         return (await this.classList(selector)).includes(name);
@@ -45,3 +50,6 @@ class State extends base_1.Base {
     }
 }
 exports.State = State;
+function toRegExp(text) {
+    return text instanceof RegExp ? text : new RegExp(text);
+}

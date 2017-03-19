@@ -45,9 +45,17 @@ export abstract class State extends Base {
   //TODO
   //isVisibleInViewport() { }
 
-  async hasText(selector: Selector, text: string | RegExp) {
-    const re = text instanceof RegExp ? text : new RegExp(text)
-    return re.test(await this.webdriver.getElementText({ id: await this.elementId(selector) }))
+  hasText(selector: Selector, text: string | RegExp): Promise<boolean>
+  hasText(selector: Selector, text: Array<string | RegExp>): Promise<boolean>
+  async hasText(selector: Selector, text: string | RegExp | Array<string | RegExp>): Promise<boolean> {
+    let regexp: RegExp[]
+    if (!Array.isArray(text)) {
+      regexp = [toRegExp(text)]
+    } else {
+      regexp = text.map(toRegExp)
+    }
+    const textContent = await this.text(selector)
+    return regexp.some(re => re.test(textContent))
   }
 
   async hasClass(selector: Selector, name: string) {
@@ -62,3 +70,6 @@ export abstract class State extends Base {
 
 }
 
+function toRegExp(text: string | RegExp) {
+  return text instanceof RegExp ? text : new RegExp(text)
+}

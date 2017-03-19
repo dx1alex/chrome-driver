@@ -13,6 +13,7 @@ export declare abstract class State extends Base {
     isReadonly(selector: Selector): Promise<boolean>;
     isVisible(selector: Selector): Promise<boolean>;
     hasText(selector: Selector, text: string | RegExp): Promise<boolean>;
+    hasText(selector: Selector, text: Array<string | RegExp>): Promise<boolean>;
     hasClass(selector: Selector, name: string): Promise<boolean>;
     hasAttribute(selector: Selector, attr: string): Promise<boolean>;
 }
