@@ -60,8 +60,7 @@ class Screenshot extends base_1.Base {
                 if (scroll < 0)
                     scroll = 0;
             }
-            const png = await this.execute((screens) => {
-                console.log('screenshot');
+            const png = await this.executeAsync((screens, done) => {
                 const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
                 const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
                 const canvas = document.createElement('canvas');
@@ -72,11 +71,13 @@ class Screenshot extends base_1.Base {
                 img.setAttribute('crossOrigin', 'anonymous');
                 for (let screen of screens) {
                     img.src = 'data:image/png;base64,' + screen.img;
-                    ctx.drawImage(img, 0, screen.scrollTop);
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, screen.scrollTop);
+                    };
                 }
-                const png = canvas.toDataURL();
-                console.log(png.length);
-                return png;
+                setTimeout(() => {
+                    done(canvas.toDataURL());
+                }, 200);
             }, screens.slice(0, 2));
             base64Data = png.substr('data:image/png;base64,'.length);
         }
@@ -110,7 +111,7 @@ class Screenshot extends base_1.Base {
             off.h += size.height;
         }
         const screen = await this.captureTab();
-        const png = await this.execute((screen, offset) => {
+        const png = await this.executeAsync((screen, offset, done) => {
             const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
             const canvas = document.createElement('canvas');
@@ -120,8 +121,10 @@ class Screenshot extends base_1.Base {
             const img = new Image(width, height);
             img.setAttribute('crossOrigin', 'anonymous');
             img.src = 'data:image/png;base64,' + screen;
-            ctx.drawImage(img, offset.x, offset.y, offset.w, offset.h, 0, 0, offset.w, offset.h);
-            return canvas.toDataURL();
+            img.onload = () => {
+                ctx.drawImage(img, offset.x, offset.y, offset.w, offset.h, 0, 0, offset.w, offset.h);
+                done(canvas.toDataURL());
+            };
         }, screen, off);
         const base64Data = png.substr('data:image/png;base64,'.length);
         if (filePath) {

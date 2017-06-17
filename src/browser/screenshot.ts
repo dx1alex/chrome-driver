@@ -74,8 +74,7 @@ export abstract class Screenshot extends Base {
         if (scroll < 0) scroll = 0
       }
 
-      const png = await this.execute<string>((screens: any[]) => {
-        console.log('screenshot')
+      const png = await this.executeAsync<string>((screens: any[], done: Function) => {
         const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
         const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 
@@ -90,13 +89,14 @@ export abstract class Screenshot extends Base {
 
         for (let screen of screens) {
           img.src = 'data:image/png;base64,' + screen.img
-          ctx.drawImage(img, 0, screen.scrollTop)
+          img.onload = () => {
+            ctx.drawImage(img, 0, screen.scrollTop)
+          }
         }
 
-        const png = canvas.toDataURL()
-        console.log(png.length)
-        return png
-
+        setTimeout(() => {
+          done(canvas.toDataURL())
+        }, 200)
       }, screens.slice(0, 2))
 
       base64Data = png.substr('data:image/png;base64,'.length)
@@ -137,23 +137,22 @@ export abstract class Screenshot extends Base {
 
     const screen = await this.captureTab()
 
-    const png = await this.execute<string>((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }) => {
+    const png = await this.executeAsync<string>((screen: string, offset: { x?: number, y?: number, w?: number, h?: number }, done: Function) => {
       const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
       const width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 
       const canvas = <HTMLCanvasElement>document.createElement('canvas')
       canvas.height = offset.h
       canvas.width = offset.w
-
       const ctx = canvas.getContext('2d')
 
       const img = new Image(width, height)
       img.setAttribute('crossOrigin', 'anonymous')
       img.src = 'data:image/png;base64,' + screen
-      ctx.drawImage(img, offset.x, offset.y, offset.w, offset.h, 0, 0, offset.w, offset.h)
-
-      return canvas.toDataURL()
-
+      img.onload = () => {
+        ctx.drawImage(img, offset.x, offset.y, offset.w, offset.h, 0, 0, offset.w, offset.h)
+        done(canvas.toDataURL())
+      }
     }, screen, off)
 
     const base64Data = png.substr('data:image/png;base64,'.length)

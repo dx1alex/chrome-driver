@@ -14,7 +14,7 @@ class Utils extends base_1.Base {
     }
     sleep(ms, ms2 = 0) {
         if (ms2) {
-            ms = (Math.random() * Math.abs(ms2 - ms) | 0) + Math.min(ms, ms2) + 1;
+            ms = Math.floor(Math.random() * Math.abs(ms2 - ms)) + Math.min(ms, ms2) + 1;
         }
         if (ms)
             return new Promise(resolve => setTimeout(resolve, ms));

@@ -21,9 +21,11 @@ export abstract class Utils extends Base {
 
   sleep(ms: number, ms2 = 0): Promise<void> {
     if (ms2) {
-      ms = (Math.random() * Math.abs(ms2 - ms) | 0) + Math.min(ms, ms2) + 1
+      ms = Math.floor(Math.random() * Math.abs(ms2 - ms)) + Math.min(ms, ms2) + 1
     }
+
     if (ms) return new Promise<void>(resolve => setTimeout(resolve, ms))
+
     return Promise.resolve()
   }
 
